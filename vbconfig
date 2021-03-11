@@ -1,0 +1,14 @@
+#!/bin/bash
+
+VM=`vboxmanage list vms | awk '{print $1}' | sed s/\"//g | fzf`
+
+vboxmanage modifyvm ${VM} --clipboard-mode bidirectional
+vboxmanage modifyvm ${VM} --draganddrop bidirectional
+vboxmanage modifyvm ${VM} --firmware efi
+vboxmanage modifyvm ${VM} --vram 256
+VBoxManage modifyvm ${VM} --cpus 4
+VBoxManage modifyvm ${VM} --pae on
+VBoxManage modifyvm ${VM} --nested-hw-virt on
+VBoxManage modifyvm ${VM} --memory 4096
+VBoxManage modifyvm ${VM} --audio none
+VBoxManage sharedfolder add ${VM} --name vmshare --hostpath ~/Dropbox/vmshare --automount

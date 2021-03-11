@@ -1,0 +1,19 @@
+#!/bin/bash
+
+echo "Installation Dropbox"
+echo "Récupérez un backup du dossier ${HOME}/Dropbox, pusi appuyez sur une touche"
+read
+if [[ ! -f /etc/apt/sources.list.d/dropbox.list ]];then
+  echo "deb [arch=amd64] http://linux.dropbox.com/debian buster main" | sudo tee -a /etc/apt/sources.list.d/dropbox.list
+fi
+
+if ! dpkg-query -W -f='${Status}' dropbox  | grep "ok installed"
+then
+  gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys FC918B335044912E
+  gpg --export --armor FC918B335044912E | sudo apt-key add
+  sudo apt update && sudo apt install -y dropbox
+  dropbox start -i
+  dropbox autostart y
+  dropbox status
+  dropbox filestatus
+fi

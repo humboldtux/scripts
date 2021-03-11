@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Install virtualbox extensions"
+echo "Veuillez monter le cd des guest additions dans la VM"
+read
+if [[ ! -f /media/cdrom0/VBoxLinuxAdditions.run ]];then
+  sudo mount /dev/sr0 /media/crdom0
+fi
+sudo sh /media/cdrom0/VBoxLinuxAdditions.run --nox11
+sudo usermod -aG vboxsf $USER

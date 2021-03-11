@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ ! -d "/opt/BurpSuiteCommunity" && ! -d "${HOME}/BurpSuiteCommunity" ]]; then
+  wget "https://portswigger.net/burp/releases/download?product=community&type=Linux" -O /tmp/burp.sh
+  sh /tmp/burp.sh
+  sudo chown root:root ${HOME}/BurpSuiteCommunity/burpbrowser/*/chrome-sandbox
+  sudo chmod u+s ${HOME}/BurpSuiteCommunity/burpbrowser/*/chrome-sandbox
+fi

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+install_browsers
+
+install_burpsuite
+
+PKGS="sudo ssh-askpass-gnome xclip keychain icedtea-netx network-manager-pptp-gnome \
+  libcanberra-gtk-module calibre libreoffice \
+  remmina-plugin-nx remmina-plugin-telepathy remmina-common \
+  remmina-plugin-exec remmina-plugin-xdmcp \
+  remmina-plugin-spice remmina-plugin-rdp remmina-plugin-secret remmina-plugin-vnc remmina \
+  nautilus-extension-burner nautilus-filename-repairer nautilus-scripts-manager"
+
+sudo apt -y install ${PKGS}
