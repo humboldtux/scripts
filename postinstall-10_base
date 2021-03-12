@@ -68,7 +68,7 @@ for PLUGIN in ${ASDF_PLUGINS}; do
 done
 
 echo "Installation pkgs cargo"
-CARGO_PKGS="tealdeer"
+CARGO_PKGS="tealdeer ripgrep"
 for PKG in ${CARGO_PKGS}; do
   cargo install ${PKG}
 done
