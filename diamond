@@ -1,0 +1,54 @@
+# diamond.sh
+#
+# Description: Desk pour travailler sur les articles
+#
+
+glmf_install() {
+  brew install pandoc
+  mkdir -p ~/dev/src/github.com/GLMF
+  git clone https://github.com/GLMF/outils_auteurs.git ~/dev/src/github.com/GLMF/outils_auteurs
+}
+
+glmf_new() {
+  mkdir ~/dev/src/github.com/humboldtux-articles/${1}
+  cd ~/dev/src/github.com/humboldtux-articles/${1} || exit 1
+  cp -n ~/dev/src/github.com/GLMF/outils_auteurs/Markdown/md-auteur/pandoc-md-auteur/modeles/modele.md ~/dev/src/github.com/humboldtux-articles/${1}/${1}.md
+  echo "build/*" > .gitignore
+  echo "cache/*" >> .gitignore
+  git init
+  git remote add origin git@github.com:humboldtux-articles/${1}.git
+  git add .
+  git commit -m'Initial commit'
+  git push --set-upstream origin master
+  MODELE=`find ${HOME}/dev/src/github.com/GLMF/outils_auteurs/Markdown/md-auteur/pandoc-md-auteur/modeles/ -type f -name "modele*template" -execdir basename {} .template ';' | fzf`
+  echo export DIAMOND_MODELE=${MODELE} > .envrc
+  direnv allow
+  git add .envrc
+  git commit -m"Ajout DIAMOND_MODELE env var"
+  git push
+}
+
+glmf_pandoc() {
+  cd ~/dev/src/github.com/humboldtux-articles/${1} || exit 1
+  rm -rf build cache
+  mkdir -p build cache
+  unzip  ~/dev/src/github.com/GLMF/outils_auteurs/Markdown/md-auteur/pandoc-md-auteur/modeles/${DIAMOND_MODELE}.odt -d ~/dev/src/github.com/humboldtux-articles/${1}/build/${DIAMOND_MODELE}.odt
+  cd ~/dev/src/github.com/humboldtux-articles/${1}
+  pandoc --verbose ${1}.md -M prefix=${1} -M images=${2} -M class=${DIAMOND_MODELE} \
+    --template=/home/benben/dev/src/github.com/GLMF/outils_auteurs/Markdown/md-auteur/pandoc-md-auteur/modeles/${DIAMOND_MODELE}.template \
+    -t ~/dev/src/github.com/GLMF/outils_auteurs/Markdown/md-auteur/pandoc-md-auteur/scripts/writer-article-gnulinuxmagazine.lua \
+    -o build/${DIAMOND_MODELE}.odt/content.xml
+  cd build/${DIAMOND_MODELE}.odt
+  zip -r "${1}.odt" *
+  xdg-open ~/dev/src/github.com/humboldtux-articles/${1}/build/${DIAMOND_MODELE}.odt/${1}.odt
+}
+
+glmf_verify() {
+  glmf_pandoc ${1} ON
+  cd ~/dev/src/github.com/humboldtux-articles/${1}/build || exit 1
+  mv *.png ~/dev/src/github.com/humboldtux-articles/${1}/build/${DIAMOND_MODELE}.odt
+}
+
+glmf_create() {
+  glmf_pandoc ${1} OFF
+}
