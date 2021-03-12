@@ -1,16 +1,10 @@
 #!/bin/bash
 
-if [[ ! $# -eq 5 ]]; then
-  echo "Erreur:  donnez en paramètre la vm de test, l'iso, le fichier preseed et le menu installer de isolinux et grub, ie:"
-  echo "Exemple:  preseed_test firmware-10.8.0-amd64-netinst.iso preseed.cfg isolinux.cfg grub.cfg"
-  exit 1
-fi
-
-VM=$1
-INPUT=$2
-PRESEED=$3
-ISOLINUX=$4
-GRUB=$5
+VM=`vboxmanage list vms | awk '{print $1}' | sed s/\"//g | fzf`
+INPUT=$1
+PRESEED=$2
+ISOLINUX=$3
+GRUB=$4
 OUTPUT="/tmp/debian-nonofficial-preseed.iso"
 
 vboxmanage controlvm ${VM} poweroff
