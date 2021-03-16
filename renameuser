@@ -9,6 +9,9 @@ OLD=$1
 NEW=$2
 
 sudo usermod -l ${NEW} ${OLD}
+sudo chfn -f ${USER} ${USER}
 sudo usermod -d /home/${NEW} -m ${NEW}
 sudo groupmod -n ${NEW} ${OLD}
+id ${USER}
+getent passwd ${USER}
 id ${NEW}
