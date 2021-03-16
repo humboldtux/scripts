@@ -1,16 +1,19 @@
 #!/bin/bash
 
   # https://framagit.org/fiat-tux/hat-softwares/preseed-creator
-  if [[ ! $# -eq 4 ]]; then
-    echo "Erreur:  donnez en paramètre l'iso, le fichier preseed et les menu installer de isolinux et grub, ie:"
-    echo "Exemple:  preseed_create ~/Téléchargements/firmware-10.8.0-amd64-netinst.iso ~/.config/preseed/preseed.cfg ~/.config/preseed/isolinux.cfg ~/.config/preseed/grub.cfg"
-    exit 1
-  fi
+  #if [[ ! $# -eq 4 ]]; then
+  #  echo "Erreur:  donnez en paramètre l'iso, le fichier preseed et les menu installer de isolinux et grub, ie:"
+  #  echo "Exemple:  preseed_create ~/Téléchargements/firmware-10.8.0-amd64-netinst.iso ~/.config/preseed/preseed.cfg ~/.config/preseed/isolinux.cfg ~/.config/preseed/grub.cfg"
+  #  exit 1
+  #fi
 
-  INPUT=$1
-  PRESEED=$2
-  ISOLINUX=$3
-  GRUB=$4
+  PRESEED_DIR="${HOME}/dev/src/github.com/humboldtux/scripts/preseed"
+
+  INPUT=${1:-`ls ~/Téléchargements/firmware-*-amd64-netinst.iso`}
+  PRESEED=${2:-${PRESEED_DIR}/preseed.cfg}
+  ISOLINUX=${3:-${PRESEED_DIR}/isolinux.cfg}
+  GRUB=${4:-${PRESEED_DIR}/grub.cfg}
+
   if [[ ! -f ${INPUT} ]]; then
     echo "Fichier ISO ${INPUT} introuvable"
     exit
@@ -22,12 +25,12 @@
   fi
 
   if [[ ! -f ${ISOLINUX} ]]; then
-    echo "Fichier menu ${ISOLINUX} introuvable"
+    echo "Fichier isolinux ${ISOLINUX} introuvable"
     exit
   fi
 
   if [[ ! -f ${GRUB} ]]; then
-    echo "Fichier menu ${GRUB} introuvable"
+    echo "Fichier grub ${GRUB} introuvable"
     exit
   fi
 
