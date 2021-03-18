@@ -112,7 +112,20 @@
 
   cd ${WORKDIR}
   echo -ne 'Creating preseeded ISO image                [==========================>   ](90%)\r'
-  genisoimage -quiet -o ${OUTPUT} -r -J -no-emul-boot -boot-load-size 4 -boot-info-table -b isolinux/isolinux.bin -c isolinux/boot.cat ${WORKDIR}/cd > /dev/null 2>&1
+  #genisoimage -quiet -o ${OUTPUT} -r -J -no-emul-boot -boot-load-size 4 -boot-info-table -b isolinux/isolinux.bin -c isolinux/boot.cat ${WORKDIR}/cd > /dev/null 2>&1
+  xorriso -as mkisofs \
+		-quiet \
+		-o $OUTPUT \
+		-isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
+		-c isolinux/boot.cat \
+		-b isolinux/isolinux.bin \
+		-no-emul-boot -boot-load-size 4 -boot-info-table \
+		-eltorito-alt-boot \
+		-e boot/grub/efi.img \
+		-no-emul-boot \
+		-isohybrid-gpt-basdat \
+		${WORKDIR}/cd /dev/null 2>&1
+
   if [ $? -ne 0 ]
   then
     echo "Error while creating the preseeded ISO image. Aborting"
