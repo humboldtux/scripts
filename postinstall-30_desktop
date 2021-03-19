@@ -12,3 +12,7 @@ PKGS="sudo ssh-askpass-gnome xclip keychain icedtea-netx network-manager-pptp-gn
   nautilus-extension-burner nautilus-filename-repairer nautilus-scripts-manager"
 
 sudo apt -y install ${PKGS}
+
+PKGS="flameshot"
+
+sudo apt -y install -t buster-backports ${PKGS}
