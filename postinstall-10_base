@@ -67,6 +67,12 @@ for PLUGIN in ${ASDF_PLUGINS}; do
   asdf global ${PLUGIN} `asdf latest ${PLUGIN}`
 done
 
+PKGS_GO="github.com/tomnomnom/gron"
+echo "Installation pkgs go"
+for PKG in ${PKGS_GO}; do
+  go get -v ${PKG}
+done
+
 echo "Installation pkgs cargo"
 CARGO_PKGS="tealdeer ripgrep"
 for PKG in ${CARGO_PKGS}; do
