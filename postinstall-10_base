@@ -8,7 +8,7 @@ fi
 PKGS="sudo vim git curl tig rdiff-backup backupninja gdebi pdftk rsync \
   firmware-linux-free firmware-linux-nonfree firmware-linux \
   python-ldap ldap-utils mariadb-client newsbeuter \
-  kitty kitty-terminfo pipx python3-venv python3-pil \
+  kitty kitty-terminfo pipx python3-venv python3-pil rustc \
   atool unrar odt2txt w3m linuxbrew-wrapper poppler-utils ranger libssl-dev pkg-config"
 
 sudo apt -y install ${PKGS}
@@ -41,7 +41,7 @@ if [[ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]];then
 fi
 . ${HOME}/.nix-profile/etc/profile.d/nix.sh
 NIX_PKGS="bash-completion bat broot direnv docker-compose dust exa ffmpegthumbnailer \
-  fzf icdiff miller navi neovim starship viu xsv \
+  fzf icdiff miller navi neovim starship viu xsv ripgrep tealdeer \
   yadm zoxide"
 
 sudo -E sh -c 'echo 1 > /proc/sys/vm/overcommit_memory' # probleme memoire
@@ -54,34 +54,6 @@ done
 if [[ ! -f "${HOME}/.config/broot/launcher/bash/br" ]];then
   broot --install
 fi
-
-echo "Installation ASDF"
-if [[ ! -d "${HOME}/.asdf" ]];then
-
-  git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf && cd ${HOME}/.asdf && git checkout "$(git describe --abbrev=0 --tags)"
-fi
-echo "Installation plugins ASDF"
-. "${HOME}/.asdf/asdf.sh"
-ASDF_PLUGINS="golang rust"
-for PLUGIN in ${ASDF_PLUGINS}; do
-  asdf plugin add ${PLUGIN}
-  asdf install ${PLUGIN} latest
-  echo "ASDF: Installation version"
-  asdf global ${PLUGIN} `asdf latest ${PLUGIN}`
-done
-
-PKGS_GO="github.com/tomnomnom/gron"
-echo "Installation pkgs go"
-for PKG in ${PKGS_GO}; do
-  go get -v ${PKG}
-done
-
-echo "Installation pkgs cargo"
-CARGO_PKGS="tealdeer ripgrep"
-for PKG in ${CARGO_PKGS}; do
-  cargo install ${PKG}
-done
-asdf reshim rust
 
 if [[ ! -d ${HOME}/dev/src/github.com/humboldtux ]]; then
   mkdir -p ${HOME}/{bin,dev,pkg} \
