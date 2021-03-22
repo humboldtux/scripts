@@ -13,6 +13,9 @@ PKGS="sudo vim git curl tig rdiff-backup backupninja gdebi pdftk rsync \
 
 sudo apt -y install ${PKGS}
 
+PKGS="golang"
+sudo apt -y install -t buster-backports ${PKGS}
+
 PIPX_PKGS="gita updog pywal mdcat youtube-dl"
 echo "Installation logiciels pipx: ${PIPX_PKGS}"
 for PKG in ${PIPX_PKGS}; do
@@ -105,7 +108,7 @@ curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 if [[ ! -f "/etc/apt/sources.list.d/microsoft.list" ]]; then
   sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-buster-prod buster main" > /etc/apt/sources.list.d/microsoft.list'
 fi
-sudo apt update && sudo apt install -y powershell
+sudo apt update && sudo apt install -y powershell gss-ntlmssp
 
 if [[ ! -d "${HOME}/.config/yadm/repo.git" ]];then
   YADM="https://github.com/humboldtux/dotfiles.git"
