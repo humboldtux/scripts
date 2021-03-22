@@ -14,5 +14,9 @@ PKGS="sudo ssh-askpass-gnome xclip keychain icedtea-netx network-manager-pptp-gn
 sudo apt -y install ${PKGS}
 
 PKGS="flameshot"
-
 sudo apt -y install -t buster-backports ${PKGS}
+gsettings set org.gnome.settings-daemon.plugins.media-keys screenshot '[]'
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flameshot/']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flameshot/ name 'PrtScr flameshot'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flameshot/ command '/usr/bin/flameshot gui'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flameshot/ binding 'Print'
