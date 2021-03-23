@@ -8,4 +8,6 @@ then
 fi
 
 echo "Installation Tor"
-sudo apt install -y torbrowser-launcher && torbrowser-launcher
+if ! dpkg-query -W -f='${Status}' torbrowser-launcher  | grep "ok installed";then
+  sudo apt install -y torbrowser-launcher && torbrowser-launcher
+fi
