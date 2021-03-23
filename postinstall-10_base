@@ -40,8 +40,8 @@ if [[ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]];then
   curl -L https://nixos.org/nix/install | sh
 fi
 . ${HOME}/.nix-profile/etc/profile.d/nix.sh
-NIX_PKGS="bash-completion bat broot direnv docker-compose dust exa ffmpegthumbnailer \
-  fzf icdiff miller navi neovim starship viu xsv ripgrep tealdeer \
+NIX_PKGS="bash-completion bat broot direnv docker-compose dust ffmpegthumbnailer \
+  fzf icdiff miller navi neovim starship viu xsv ripgrep tealdeer grex \
   yadm zoxide"
 
 sudo -E sh -c 'echo 1 > /proc/sys/vm/overcommit_memory' # probleme memoire
@@ -54,6 +54,12 @@ done
 if [[ ! -f "${HOME}/.config/broot/launcher/bash/br" ]];then
   broot --install
 fi
+
+echo "Installation pkgs cargo"
+CARGO_PKGS="exa"
+for PKG in ${CARGO_PKGS}; do
+  cargo install ${PKG}
+done
 
 if [[ ! -d ${HOME}/dev/src/github.com/humboldtux ]]; then
   mkdir -p ${HOME}/{bin,dev,pkg} \
@@ -83,9 +89,9 @@ fi
 sudo apt update && sudo apt install -y powershell gss-ntlmssp
 
 if [[ ! -d "${HOME}/.config/yadm/repo.git" ]];then
-  YADM="https://github.com/humboldtux/dotfiles.git"
-  yadm upgrade ${YADM} || yadm clone ${YADM}
+  yadm clone "https://github.com/humboldtux/dotfiles.git"
 fi
+
 if [[ ! -d "${HOME}/.cache/wal" ]];then
   wal --theme vscode
 fi
