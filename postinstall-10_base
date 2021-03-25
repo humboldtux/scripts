@@ -5,10 +5,11 @@ if [[ ! -f "/etc/apt/sources.list.d/backports.list" ]]; then
   echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" | sudo tee -a /etc/apt/sources.list.d/backports.list
   sudo apt-get update && sudo apt-get upgrade -y > /dev/null
 fi
+
 PKGS="sudo vim git curl tig rdiff-backup backupninja gdebi pdftk rsync \
   firmware-linux-free firmware-linux-nonfree firmware-linux \
-  python-ldap ldap-utils mariadb-client newsbeuter \
-  kitty kitty-terminfo pipx python3-venv python3-pil jq \
+  python-ldap ldap-utils mariadb-client newsbeuter dkms \
+  kitty kitty-terminfo pipx python3-venv python3-pil jq ruby-dev \
   atool unrar odt2txt w3m linuxbrew-wrapper poppler-utils ranger libssl-dev pkg-config"
 
 sudo apt-get -y install ${PKGS} > /dev/null
@@ -27,7 +28,7 @@ PATH=${HOME}/.local/bin:${PATH}
 
 if [[ ! -d "${HOME}/.local/share/fonts/NerdFonts" ]];then
   echo "Installing Nerd Fonts"
-  git clone --depth 1 https://github.com/ryanoasis/nerd-fonts.git /tmp/nerd-fonts > /dev/null && \
+  git clone -q --depth 1 https://github.com/ryanoasis/nerd-fonts.git /tmp/nerd-fonts > /dev/null && \
     cd /tmp/nerd-fonts && \
     ./install.sh JetBrainsMono > /dev/null
 fi
@@ -42,9 +43,9 @@ NIX_PKGS="bash-completion bat broot direnv docker-compose dust ffmpegthumbnailer
   yadm zoxide"
 
 sudo -E sh -c 'echo 1 > /proc/sys/vm/overcommit_memory' # probleme memoire
-echo "Installation pkg nix"
 for PKG in ${NIX_PKGS}; do
   if [[ ! -L "${HOME}/.nix-profile/bin/${PKG}" ]]; then
+    echo "Installation pkg nix ${PKG}"
     nix-env --quiet -i ${PKG} > /dev/null
   fi
 done
@@ -78,7 +79,7 @@ if [[ ! -d ${HOME}/dev/src/github.com/humboldtux ]]; then
     ${HOME}/dev/src/github.com/humboldtux
 fi
 
-if ! dpkg-query -W -f='${Status}' docker-ce  | grep "ok installed"
+if ! dpkg-query -W -f='${Status}' docker-ce > /dev/null
 then
   echo "Installation Docker"
   curl -sSL https://get.docker.com/ | sh
@@ -87,7 +88,7 @@ then
   sudo systemctl -q restart docker
 fi
 
-if ! dpkg-query -W -f='${Status}' sysdig  | grep "ok installed"
+if ! dpkg-query -W -f='${Status}' sysdig > /dev/null
 then
   echo "Installation sysdig"
   curl -sSL https://s3.amazonaws.com/download.draios.com/stable/install-sysdig | sudo bash
@@ -95,7 +96,7 @@ fi
 
 if [[ ! -f "/etc/apt/sources.list.d/microsoft.list" ]]; then
   echo "Installation Powershell"
-  curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+  curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
   sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-buster-prod buster main" > /etc/apt/sources.list.d/microsoft.list'
 fi
 sudo apt-get update > /dev/null && sudo apt-get install -y powershell gss-ntlmssp > /dev/null

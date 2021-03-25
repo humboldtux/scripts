@@ -1,10 +1,10 @@
 #!/bin/bash
 
-echo "Installation Teams"
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 if [[ ! -f "/etc/apt/sources.list.d/teams.list" ]]; then
+  echo "Installation Teams"
+  curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null
   sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main" > /etc/apt/sources.list.d/teams.list'
-  sudo apt update
+  sudo apt-get update > /dev/null
+  sudo apt-get install -y teams > /dev/null
+  [[ -f ${HOME}/.config/autostart/teams.desktop ]] && rm {HOME}/.config/autostart/teams.desktop
 fi
-sudo apt install -y teams
-[[ -f ${HOME}/.config/autostart/teams.desktop ]] && rm {HOME}/.config/autostart/teams.desktop

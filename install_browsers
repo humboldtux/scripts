@@ -1,13 +1,14 @@
 #!/bin/bash
 
-echo "Installation Chrome"
-if ! dpkg-query -W -f='${Status}' google-chrome-stable  | grep "ok installed"
+if ! dpkg-query -W -f='${Status}' google-chrome-stable > /dev/null
 then
-  wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/chrome.deb
-  sudo gdebi /tmp/chrome.deb
+  echo "Installation Chrome"
+  wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/chrome.deb
+  sudo apt install -y /tmp/chrome.deb > /dev/null
 fi
 
-echo "Installation Tor"
-if ! dpkg-query -W -f='${Status}' torbrowser-launcher  | grep "ok installed";then
-  sudo apt install -y torbrowser-launcher && torbrowser-launcher
+if ! dpkg-query -W -f='${Status}' torbrowser-launcher > /dev/null
+then
+  echo "Installation Tor"
+  sudo apt-get install -y torbrowser-launcher  > /dev/null && torbrowser-launcher > /dev/null
 fi

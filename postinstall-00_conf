@@ -1,11 +1,10 @@
 #!/bin/bash
 
-sudo apt-get remove --auto-remove man-db
-
 echo "Desactivation accès root"
-sudo passwd -l root
+sudo passwd -l root > /dev/null
 
 echo "désactivation maj cache man-db"
+sudo apt-get -y remove --auto-remove man-db > /dev/null
 sudo systemctl mask man-db.service
 sudo systemctl daemon-reload
 
@@ -13,11 +12,11 @@ echo "désactivation veille automatique"
 sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
 echo "Installation Parefeu"
-if ! dpkg-query -W -f='${Status}' firewalld  | grep "ok installed"
+if ! dpkg-query -W -f='${Status}' firewalld > /dev/null
 then
-  sudo apt update
-  sudo apt install -y firewalld
-  sudo firewall-cmd --set-default-zone=drop
-  sudo firewall-cmd --runtime-to-permanent
-  sudo firewall-cmd --reload
+  sudo apt-get update > /dev/null
+  sudo apt-get install -y firewalld > /dev/null
+  sudo firewall-cmd -q --set-default-zone=drop
+  sudo firewall-cmd -q --runtime-to-permanent
+  sudo firewall-cmd -q --reload
 fi
