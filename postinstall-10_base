@@ -14,7 +14,7 @@ PKGS="sudo vim git curl tig rdiff-backup backupninja gdebi pdftk rsync \
 
 sudo apt-get -y install ${PKGS} > /dev/null
 
-PIPX_PKGS="gita updog pywal mdcat youtube-dl"
+PIPX_PKGS="gita updog pywal mdcat youtube-dl diffoscope"
 echo "Installation logiciels pipx: ${PIPX_PKGS}"
 for PKG in ${PIPX_PKGS}; do
   if [[ ! -d "${HOME}/.local/pipx/venvs/${PKG}" ]];then
@@ -73,6 +73,12 @@ for PKG in ${CARGO_PKGS}; do
   cargo -q install ${PKG}
 done
 asdf reshim rust
+
+PKGS_GO="github.com/akavel/up"
+echo "Installation go get"
+for PKG in ${PKGS_GO}; do
+  go get ${PKG}
+done
 
 if [[ ! -d ${HOME}/dev/src/github.com/humboldtux ]]; then
   mkdir -p ${HOME}/{bin,dev,pkg} \
