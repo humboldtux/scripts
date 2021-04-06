@@ -35,7 +35,7 @@
   fi
 
   LOOPDIR="/mnt/loopdir"
-  OUTPUT="/tmp/debian-nonofficial-preseed.iso"
+  OUTPUT="/tmp/debian-nonfree-preseed.iso"
   WORKDIR="/tmp/preseed"
 
   sudo -l > /dev/null
