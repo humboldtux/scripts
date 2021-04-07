@@ -5,18 +5,13 @@ install_browsers
 install_burpsuite
 
 PKGS="ssh-askpass-gnome xclip keychain icedtea-netx network-manager-pptp-gnome \
-  libcanberra-gtk-module calibre libreoffice \
-  remmina-plugin-nx remmina-plugin-telepathy remmina-common \
-  remmina-plugin-exec remmina-plugin-xdmcp \
+  libcanberra-gtk-module calibre libreoffice flameshot \
+  remmina-plugin-nx remmina-common remmina-plugin-exec remmina-plugin-xdmcp \
   remmina-plugin-spice remmina-plugin-rdp remmina-plugin-secret remmina-plugin-vnc remmina \
   nautilus-extension-burner nautilus-filename-repairer nautilus-scripts-manager"
 
 echo "Installation apt-get ${PKGS}"
 sudo apt-get -y install ${PKGS} > /dev/null
-
-PKGS="flameshot"
-echo "Installation apt-get backports ${PKGS}"
-sudo apt-get -y install -t buster-backports ${PKGS} > /dev/null
 
 echo "Ajout shorcut flameshot"
 gsettings set org.gnome.settings-daemon.plugins.media-keys screenshot '[]'

@@ -1,17 +1,20 @@
 #!/bin/bash
 
+CODENAME=`lsb_release -sc`
+
 if [[ ! -f "/etc/apt/sources.list.d/backports.list" ]]; then
   echo "Activation des dépôts backports"
-  echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" | sudo tee -a /etc/apt/sources.list.d/backports.list
-  sudo apt-get update && sudo apt-get upgrade -y > /dev/null
+  echo "deb http://deb.debian.org/debian ${CODENAME}-backports main contrib non-free" | sudo tee -a /etc/apt/sources.list.d/backports.list
+  sudo apt-get update > /dev/null ; sudo apt-get upgrade -y > /dev/null
 fi
 
 PKGS="sudo vim git curl tig rdiff-backup backupninja gdebi pdftk rsync \
   firmware-linux-free firmware-linux-nonfree firmware-linux \
   python-ldap ldap-utils mariadb-client newsboat dkms \
   kitty kitty-terminfo pipx python3-venv python3-pil jq linux-headers-amd64 ruby-dev \
-  atool unrar odt2txt w3m linuxbrew-wrapper poppler-utils ranger libssl-dev pkg-config"
+  atool unrar odt2txt w3m linuxbrew-wrapper poppler-utils ranger libssl-dev pkg-config xorriso"
 
+echo "Installation APT: ${PKGS}"
 sudo apt-get -y install ${PKGS} > /dev/null
 
 PIPX_PKGS="gita updog pywal mdcat youtube-dl diffoscope"
@@ -39,8 +42,7 @@ if [[ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]];then
 . ${HOME}/.nix-profile/etc/profile.d/nix.sh
 fi
 NIX_PKGS="bash-completion bat broot direnv docker-compose dust ffmpegthumbnailer \
-  fzf icdiff miller navi neovim starship viu xsv ripgrep tealdeer grex \
-  yadm zoxide"
+  fzf icdiff miller navi neovim starship viu xsv ripgrep grex yadm zoxide"
 
 sudo -E sh -c 'echo 1 > /proc/sys/vm/overcommit_memory' # probleme memoire
 for PKG in ${NIX_PKGS}; do
@@ -85,6 +87,12 @@ if [[ ! -d ${HOME}/dev/src/github.com/humboldtux ]]; then
     ${HOME}/dev/src/github.com/humboldtux
 fi
 
+if ! dpkg-query -W -f='${Status}' sysdig > /dev/null
+then
+  echo "Installation sysdig"
+  curl -sSL https://s3.amazonaws.com/download.draios.com/stable/install-sysdig | sudo bash
+fi
+
 if ! dpkg-query -W -f='${Status}' docker-ce > /dev/null
 then
   echo "Installation Docker"
@@ -94,18 +102,12 @@ then
   sudo systemctl -q restart docker
 fi
 
-if ! dpkg-query -W -f='${Status}' sysdig > /dev/null
-then
-  echo "Installation sysdig"
-  curl -sSL https://s3.amazonaws.com/download.draios.com/stable/install-sysdig | sudo bash
-fi
-
 if [[ ! -f "/etc/apt/sources.list.d/microsoft.list" ]]; then
   echo "Installation Powershell"
   curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-  sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-buster-prod buster main" > /etc/apt/sources.list.d/microsoft.list'
+  sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-${CODENAME}-prod ${CODENAME} main" > /etc/apt/sources.list.d/microsoft.list'
 fi
-sudo apt-get update > /dev/null && sudo apt-get install -y powershell gss-ntlmssp > /dev/null
+sudo apt-get update > /dev/null ; sudo apt-get install -y powershell gss-ntlmssp > /dev/null
 
 if [[ ! -d "${HOME}/.config/yadm/repo.git" ]];then
   echo "Installation Yadm"

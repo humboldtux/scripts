@@ -3,7 +3,8 @@
 VBPKG='virtualbox-6.1'
 
 if [[ ! -f "/etc/apt/sources.list.d/virtualbox.list" ]];then
-  echo "deb http://download.virtualbox.org/virtualbox/debian buster contrib" | sudo tee -a /etc/apt/sources.list.d/virtualbox.list
+  CODENAME=`lsb_release -sc`
+  echo "deb http://download.virtualbox.org/virtualbox/debian ${CODENAME} contrib" | sudo tee -a /etc/apt/sources.list.d/virtualbox.list
 fi
 if ! dpkg-query -W -f='${Status}' ${VBPKG} > /dev/null
 then

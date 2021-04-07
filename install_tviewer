@@ -3,7 +3,7 @@
 if [[ ! -d /opt/teamviewer ]];then
   wget -q https://download.teamviewer.com/download/linux/teamviewer_amd64.tar.xz -O /tmp/teamviewer_amd64.tar.xz
   sudo tar xf /tmp/teamviewer_amd64.tar.xz -C /opt
-  sudo chown -R benben /opt/teamviewer*
+  sudo chown -R ${USER} /opt/teamviewer*
 
   /opt/teamviewer/tv-setup checklibs #Vérifier les dépendances QT
   sudo apt-get install -y libdbus-1-3 libqt5gui5 libqt5widgets5 libqt5qml5 libqt5quick5 \

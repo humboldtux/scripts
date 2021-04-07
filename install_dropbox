@@ -2,7 +2,8 @@
 
 read
 if [[ ! -f /etc/apt/sources.list.d/dropbox.list ]];then
-  echo "deb [arch=amd64] http://linux.dropbox.com/debian buster main" | sudo tee -a /etc/apt/sources.list.d/dropbox.list
+  CODENAME=`lsb_release -sc`
+  echo "deb [arch=amd64] http://linux.dropbox.com/debian ${CODENAME} main" | sudo tee -a /etc/apt/sources.list.d/dropbox.list
 fi
 
 if ! dpkg-query -W -f='${Status}' dropbox > /dev/null
