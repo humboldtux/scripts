@@ -5,7 +5,7 @@ install_browsers
 install_burpsuite
 
 PKGS="ssh-askpass-gnome xclip keychain icedtea-netx network-manager-pptp-gnome \
-  libcanberra-gtk-module calibre libreoffice flameshot \
+  libcanberra-gtk-module calibre libreoffice flameshot copyq \
   remmina-plugin-nx remmina-common remmina-plugin-exec remmina-plugin-xdmcp \
   remmina-plugin-spice remmina-plugin-rdp remmina-plugin-secret remmina-plugin-vnc remmina \
   nautilus-extension-burner nautilus-filename-repairer nautilus-scripts-manager"
