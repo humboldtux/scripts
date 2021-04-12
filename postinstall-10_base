@@ -10,7 +10,7 @@ fi
 
 PKGS="sudo vim git curl tig rdiff-backup backupninja gdebi pdftk rsync \
   firmware-linux-free firmware-linux-nonfree firmware-linux \
-  python-ldap ldap-utils mariadb-client newsboat dkms \
+  python-ldap ldap-utils mariadb-client newsboat dkms openvpn \
   kitty kitty-terminfo pipx python3-venv python3-pil jq linux-headers-amd64 ruby-dev \
   atool unrar odt2txt w3m linuxbrew-wrapper poppler-utils ranger libssl-dev pkg-config xorriso"
 
