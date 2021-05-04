@@ -8,15 +8,20 @@ sudo apt-get -y remove --auto-remove man-db > /dev/null
 sudo systemctl mask man-db.service
 sudo systemctl daemon-reload
 
+echo "Désactivation Evolution"
+sudo chmod -x /usr/lib/evolution/evolution-addressbook-factory
+sudo chmod -x /usr/lib/evolution/evolution-calendar-factory
+sudo chmod -x /usr/lib/evolution/evolution-source-registry
+
 echo "désactivation veille automatique"
 sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
-echo "Installation Parefeu"
-if ! dpkg-query -W -f='${Status}' firewalld > /dev/null
-then
-  sudo apt-get update > /dev/null
-  sudo apt-get install -y firewalld > /dev/null
-  sudo firewall-cmd -q --set-default-zone=drop
-  sudo firewall-cmd -q --runtime-to-permanent
-  sudo firewall-cmd -q --reload
-fi
+#echo "Installation Parefeu"
+#if ! dpkg-query -W -f='${Status}' firewalld > /dev/null
+#then
+#  sudo apt-get update > /dev/null
+#  sudo apt-get install -y firewalld > /dev/null
+#  sudo firewall-cmd -q --set-default-zone=drop
+#  sudo firewall-cmd -q --runtime-to-permanent
+#  sudo firewall-cmd -q --reload
+#fi
