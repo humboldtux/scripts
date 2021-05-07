@@ -9,10 +9,10 @@ if [[ ! -f "/etc/apt/sources.list.d/backports.list" ]]; then
 fi
 
 PKGS="sudo vim git curl tig rdiff-backup backupninja gdebi pdftk rsync \
-  firmware-linux-free firmware-linux-nonfree firmware-linux ftp \
+  firmware-linux-free firmware-linux-nonfree firmware-linux ftp dos2unix \
   python3-ldap ldap-utils libproxychains4 locate mariadb-client newsboat dkms openvpn detox \
   kitty kitty-terminfo putty-tools python3-venv python3-pil python3-pip jq linux-headers-amd64 ruby-dev \
-  atool unrar odt2txt w3m poppler-utils ranger tcpdump tshark libssl-dev pkg-config samba-common xorriso"
+  atool unrar odt2txt w3m poppler-utils ranger tcpdump tshark libssl-dev pkg-config samba-common strace xorriso"
 
 echo "Installation APT: ${PKGS}"
 sudo apt-get -y install ${PKGS} > /dev/null
@@ -44,7 +44,7 @@ if [[ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]];then
   curl -sSL https://nixos.org/nix/install | sh
 . ${HOME}/.nix-profile/etc/profile.d/nix.sh
 fi
-NIX_PKGS="bash-completion bat broot direnv docker-compose dust ffmpegthumbnailer \
+NIX_PKGS="bash-completion bat broot delta direnv docker-compose dust ffmpegthumbnailer \
   fzf icdiff miller navi neovim starship viu xsv ripgrep grex yadm zoxide"
 
 sudo -E sh -c 'echo 1 > /proc/sys/vm/overcommit_memory' # probleme memoire
