@@ -45,7 +45,7 @@ if [[ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]];then
 . ${HOME}/.nix-profile/etc/profile.d/nix.sh
 fi
 NIX_PKGS="bash-completion bat broot delta direnv docker-compose dust ffmpegthumbnailer \
-  fzf icdiff miller navi neovim starship viu xsv ripgrep grex yadm zoxide"
+  fzf icdiff miller navi neovim starship viu xsv ripgrep grex yadm zoxide swaks"
 
 sudo -E sh -c 'echo 1 > /proc/sys/vm/overcommit_memory' # probleme memoire
 for PKG in ${NIX_PKGS}; do
