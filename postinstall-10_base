@@ -9,7 +9,7 @@ if [[ ! -f "/etc/apt/sources.list.d/backports.list" ]]; then
 fi
 
 PKGS="sudo vim git curl tig rdiff-backup backupninja gdebi pdftk rsync \
-  firmware-linux-free firmware-linux-nonfree firmware-linux ftp dos2unix \
+  firmware-linux-free firmware-linux-nonfree firmware-linux ftp dos2unix okular \
   python3-ldap ldap-utils libproxychains4 locate mariadb-client newsboat dkms openvpn detox \
   kitty kitty-terminfo putty-tools python3-venv python3-pil python3-pip jq linux-headers-amd64 ruby-dev \
   atool unrar odt2txt w3m poppler-utils ranger tcpdump tshark libssl-dev pkg-config samba-common strace xorriso"
