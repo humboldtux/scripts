@@ -20,7 +20,7 @@ sudo apt-get -y install ${PKGS} > /dev/null
 python3 -m pip install --user pipx > /dev/null
 export PATH="$PATH:${HOME}/.local/bin"
 
-PIPX_PKGS="gita updog pywal mdcat youtube-dl diffoscope"
+PIPX_PKGS="gita updog pywal mdcat youtube-dl diffoscope reindent"
 echo "Installation logiciels pipx: ${PIPX_PKGS}"
 for PKG in ${PIPX_PKGS}; do
   if [[ ! -d "${HOME}/.local/pipx/venvs/${PKG}" ]];then
