@@ -1,0 +1,18 @@
+#!/bin/bash
+
+pipx upgrade-all
+
+nix-collect-garbage
+nix-channel --list
+nix-env --upgrade
+nix-collect-garbage
+
+asdf update
+asdf plugin update --all
+rustup update
+asdf reshim rust
+cargo install-update -a
+asdf reshim rust
+
+sudo apt update -y
+sudo apt upgrade -y

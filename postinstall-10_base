@@ -73,7 +73,7 @@ for PLUGIN in ${ASDF_PLUGINS}; do
 done
 
 echo "Installation pkgs cargo"
-CARGO_PKGS="exa"
+CARGO_PKGS="exa cargo-update"
 for PKG in ${CARGO_PKGS}; do
   cargo -q install ${PKG}
 done
