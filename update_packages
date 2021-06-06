@@ -16,3 +16,7 @@ asdf reshim rust
 
 sudo apt update -y
 sudo apt upgrade -y
+
+sudo gem cleanup
+sudo gem update
+sudo gem cleanup
