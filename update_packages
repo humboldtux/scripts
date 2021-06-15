@@ -1,22 +1,13 @@
 #!/bin/bash
 
-pipx upgrade-all
+topgrade
 
-nix-collect-garbage
-nix-channel --list
-nix-env --upgrade
-nix-collect-garbage
+#nix-collect-garbage
 
-asdf update
-asdf plugin update --all
-rustup update
-asdf reshim rust
-cargo install-update -a
 asdf reshim rust
 
-sudo apt update -y
-sudo apt upgrade -y
+#sudo gem cleanup
+#sudo gem update
+#sudo gem cleanup
 
-sudo gem cleanup
-sudo gem update
-sudo gem cleanup
+sudo needrestart
