@@ -8,7 +8,7 @@ if [[ ! -f "/etc/apt/sources.list.d/backports.list" ]]; then
   sudo apt-get update > /dev/null ; sudo apt-get upgrade -y > /dev/null
 fi
 
-PKGS="atool backupninja curl detox dkms dos2unix firmware-linux firmware-linux-free firmware-linux-nonfree \
+PKGS="atool backupninja build-essential curl detox dkms dos2unix firmware-linux firmware-linux-free firmware-linux-nonfree \
   ftp gdebi git jq kitty kitty-terminfo ldap-utils libproxychains4 libssl-dev linux-headers-amd64 locate \
   mariadb-client needrestart newsboat odt2txt okular openvpn pdftk pkg-config poppler-utils putty-tools \
   python3-ldap python3-pil python3-pip python3-venv ranger rdiff-backup rsync ruby-dev samba-common strace \
@@ -112,9 +112,9 @@ if [[ ! -f "/etc/apt/sources.list.d/microsoft.list" ]]; then
 fi
 sudo apt-get update > /dev/null ; sudo apt-get install -y powershell gss-ntlmssp > /dev/null
 
-if [[ ! -d "${HOME}/.config/yadm/repo.git" ]];then
+if [[ ! -d "${HOME}/.local/share/yadm/repo.git" ]];then
   echo "Installation Yadm"
-  yadm clone "https://github.com/humboldtux/dotfiles.git" > /dev/null
+  yadm clone "https://github.com/humboldtux/dotfiles.git"
 fi
 
 if [[ ! -d "${HOME}/.cache/wal" ]];then
