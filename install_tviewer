@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#https://www.how2shout.com/linux/install-teamviewer-on-debian-11-or-10-using-command-terminal/
+
 if [[ ! -d /opt/teamviewer ]];then
   wget -q https://download.teamviewer.com/download/linux/teamviewer_amd64.tar.xz -O /tmp/teamviewer_amd64.tar.xz
   sudo tar xf /tmp/teamviewer_amd64.tar.xz -C /opt
