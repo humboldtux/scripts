@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+SUDO='/usr/bin/sudo'
+ARCH=$(uname -m)
+BASE_URL=https://repo.nordvpn.com/
+KEY_PATH=/gpg/nordvpn_public.asc
+REPO_PATH_DEB=/deb/nordvpn/debian
+RELEASE="stable main"
+PUB_KEY=${BASE_URL}${KEY_PATH}
+REPO_URL_DEB=${BASE_URL}${REPO_PATH_DEB}
+
+if [[ ! -f "/etc/apt/sources.list.d/nordvpn.list" ]];then
+  wget -qO - "${PUB_KEY}" | $SUDO tee /etc/apt/trusted.gpg.d/nordvpn_public.asc > /dev/null
+  echo "deb ${REPO_URL_DEB} ${RELEASE}" | $SUDO tee /etc/apt/sources.list.d/nordvpn.list
+  $SUDO apt-get -y update
+fi
+
+if ! dpkg-query -W -f='${Status}' nordvpn > /dev/null
+then
+  $SUDO apt-get -y install nordvpn
+fi
+
+echo 'su - $USER'
+echo '/usr/bin/nordvpn set technology nordlynx'
+echo '/usr/bin/nordvpn set killswitch on'
+echo '/usr/bin/nordvpn login'
