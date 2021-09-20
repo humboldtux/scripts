@@ -23,5 +23,5 @@ fi
 
 echo 'su - $USER'
 echo '/usr/bin/nordvpn set technology nordlynx'
-echo '/usr/bin/nordvpn set killswitch on'
 echo '/usr/bin/nordvpn login'
+echo '/usr/bin/nordvpn set killswitch on'
