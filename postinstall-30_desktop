@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 echo "Disable GDM Wayland"
 sudo sed -i s/#Wayland/Wayland/g /etc/gdm3/daemon.conf
 

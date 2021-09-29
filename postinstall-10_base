@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 CODENAME=`lsb_release -sc`
 
 if [[ ! -f "/etc/apt/sources.list.d/backports.list" ]]; then
@@ -20,7 +22,7 @@ sudo apt-get -y install ${PKGS} > /dev/null
 python3 -m pip install --user pipx > /dev/null
 export PATH="$PATH:${HOME}/.local/bin"
 
-PIPX_PKGS="gita updog pywal mdcat youtube-dl diffoscope reindent pywhat"
+PIPX_PKGS="gita updog pywal mdcat youtube-dl yt-dlp diffoscope reindent pywhat"
 echo "Installation logiciels pipx: ${PIPX_PKGS}"
 for PKG in ${PIPX_PKGS}; do
   if [[ ! -d "${HOME}/.local/pipx/venvs/${PKG}" ]];then
@@ -73,7 +75,7 @@ for PLUGIN in ${ASDF_PLUGINS}; do
 done
 
 echo "Installation pkgs cargo"
-CARGO_PKGS="exa cargo-update topgrade"
+CARGO_PKGS="git-delta exa cargo-update topgrade"
 for PKG in ${CARGO_PKGS}; do
   ${HOME}/.asdf/shims/cargo -q install ${PKG}
 done

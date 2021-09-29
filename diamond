@@ -1,6 +1,8 @@
 #!/bin/bash
 
-CMD="${1}"
+export DEBIAN_FRONTEND=noninteractive
+
+nameCMD="${1}"
 NAME="${2}"
 ARTICLE_DIR="${HOME}/dev/src/github.com/humboldtux-articles/${NAME}"
 GLMF_REPO="${HOME}/dev/src/github.com/GLMF/outils_auteurs"

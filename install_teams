@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 if [[ ! -f "/etc/apt/sources.list.d/teams.list" ]]; then
   echo "Installation Teams"
   curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null
