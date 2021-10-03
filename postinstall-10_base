@@ -66,7 +66,7 @@ if [[ ! -d "${HOME}/.asdf" ]];then
   . "${HOME}/.asdf/asdf.sh"
 fi
 echo "Installation plugins ASDF"
-ASDF_PLUGINS="golang rust"
+ASDF_PLUGINS="golang rust nodejs"
 for PLUGIN in ${ASDF_PLUGINS}; do
   ${HOME}/.asdf/bin/asdf plugin add ${PLUGIN} > /dev/null
   ${HOME}/.asdf/bin/asdf install ${PLUGIN} latest > /dev/null
@@ -75,7 +75,7 @@ for PLUGIN in ${ASDF_PLUGINS}; do
 done
 
 echo "Installation pkgs cargo"
-CARGO_PKGS="git-delta exa cargo-update topgrade"
+CARGO_PKGS="git-delta exa cargo-update topgrade tv"
 for PKG in ${CARGO_PKGS}; do
   ${HOME}/.asdf/shims/cargo -q install ${PKG}
 done
