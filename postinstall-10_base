@@ -84,7 +84,7 @@ ${HOME}/.asdf/bin/asdf reshim rust
 PKGS_GO="github.com/akavel/up"
 echo "Installation go get"
 for PKG in ${PKGS_GO}; do
-  ${HOME}/.asdf/shims/go get ${PKG}
+  ${HOME}/.asdf/shims/go install ${PKG}@latest
 done
 
 if [[ ! -d ${HOME}/dev/src/github.com/humboldtux ]]; then
@@ -121,6 +121,7 @@ sudo apt-get update > /dev/null ; sudo apt-get install -y powershell gss-ntlmssp
 if [[ ! -d "${HOME}/.local/share/yadm/repo.git" ]];then
   echo "Installation Yadm"
   ${HOME}/.nix-profile/bin/yadm clone "https://github.com/humboldtux/dotfiles.git"
+  ${HOME}/.nix-profile/bin/yadm reset --hard
 fi
 
 if [[ ! -d "${HOME}/.cache/wal" ]];then
