@@ -37,9 +37,13 @@ PATH=${HOME}/.local/bin:${PATH}
 
 if [[ ! -d "${HOME}/.local/share/fonts/NerdFonts" ]];then
   echo "Installing Nerd Fonts"
-  git clone -q --depth 1 https://github.com/ryanoasis/nerd-fonts.git /tmp/nerd-fonts > /dev/null && \
-    cd /tmp/nerd-fonts && \
-    ./install.sh JetBrainsMono > /dev/null
+   sudo apt-get install -y subversion-tools > /dev/null
+   mkdir -p /tmp/nerd-fonts/patched-fonts
+   cd /tmp/nerd-fonts/patched-fonts
+   svn export https://github.com/ryanoasis/nerd-fonts/trunk/patched-fonts/JetBrainsMono > /dev/null
+   cd /tmp/nerd-fonts/
+   wget -q https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/install.sh
+   bash install.sh JetBrainsMono > /dev/null
 fi
 
 if [[ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]];then
