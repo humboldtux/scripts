@@ -17,5 +17,5 @@ if [[ ! -f "/etc/apt/sources.list.d/deb-multimedia.list" ]]; then
 fi
 
 echo "Installation Multimedia"
-sudo apt-get install -y vlc vlc-plugin-base libnfs13 handbrake* libdvdnav4 libdvd-pkg libdvdread8 libdvd-pkg > /dev/null
-sudo dpkg-reconfigure libdvd-pkg > /dev/null
+sudo apt-get install -y vlc vlc-plugin-base libnfs13 handbrake* libdvdnav4 libdvd-pkg libdvdread8 libdvd-pkg
+sudo dpkg-reconfigure libdvd-pkg
