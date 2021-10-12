@@ -129,4 +129,5 @@ if [[ ! -d "${HOME}/.cache/wal" ]];then
   ${HOME}/.local/bin/wal -q --theme vscode
 fi
 
-vim_pluginstall
+${HOME}/dev/src/github.com/humboldtux/scripts/vim_pluginstall
+${HOME}/dev/src/github.com/humboldtux/scripts/vim_pluginstall
