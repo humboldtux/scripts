@@ -10,7 +10,8 @@ install_browsers
 install_burpsuite
 
 PKGS="freerdp2-x11 ssh-askpass-gnome xclip keychain icedtea-netx network-manager-pptp-gnome \
-  libcanberra-gtk-module calibre libreoffice flameshot copyq rdesktop lightdm-remote-session-freerdp2 \
+  libcanberra-gtk-module calibre libreoffice flameshot pepperflashplugin-nonfree ttf-xfree86-nonfree \
+  copyq rdesktop lightdm-remote-session-freerdp2 \
   nautilus-extension-burner nautilus-filename-repairer nautilus-scripts-manager wireshark zathura"
 
 echo "Installation apt-get ${PKGS}"
