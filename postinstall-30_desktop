@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
 
 echo "Disable GDM Wayland"
 sudo sed -i s/#Wayland/Wayland/g /etc/gdm3/daemon.conf

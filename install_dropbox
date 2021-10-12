@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
 
 if [[ ! -f /etc/apt/sources.list.d/dropbox.list ]];then
   CODENAME=`lsb_release -sc`

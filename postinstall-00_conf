@@ -1,6 +1,10 @@
 #!/bin/bash
 
 export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
+echo "Config Git"
+git config --global pull.ff only
 
 echo "Desactivation accès root"
 sudo passwd -l root > /dev/null

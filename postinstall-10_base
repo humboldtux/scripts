@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
 
 CODENAME=`lsb_release -sc`
 

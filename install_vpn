@@ -10,6 +10,7 @@ RELEASE="stable main"
 PUB_KEY=${BASE_URL}${KEY_PATH}
 REPO_URL_DEB=${BASE_URL}${REPO_PATH_DEB}
 export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
 
 if [[ ! -f "/etc/apt/sources.list.d/nordvpn.list" ]];then
   wget -qO - "${PUB_KEY}" | $SUDO tee /etc/apt/trusted.gpg.d/nordvpn_public.asc > /dev/null
