@@ -25,6 +25,6 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/or
 
 if [[ ! -f "${HOME}/.local/bin/obsidian" ]]; then
   echo "Installation Obsidian"
-  wget 'https://github-releases.githubusercontent.com/262342594/8a57f892-954f-46aa-9621-a23dfe8bbd6d?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20210818%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210818T171211Z&X-Amz-Expires=300&X-Amz-Signature=de4250daff5b913339cc5ee195d8509eadb38fea9fbe296ebe1458ce0bbff6e7&X-Amz-SignedHeaders=host&actor_id=65201&key_id=0&repo_id=262342594&response-content-disposition=attachment%3B%20filename%3DObsidian-0.12.12.AppImage&response-content-type=application%2Foctet-stream' -O ${HOME}/.local/bin/obsidian
+  wget 'https://github.com/obsidianmd/obsidian-releases/releases/download/v0.12.15/Obsidian-0.12.15.AppImage' -O ${HOME}/.local/bin/obsidian
   chmod +x ${HOME}/.local/bin/obsidian
 fi
