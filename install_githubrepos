@@ -1,0 +1,16 @@
+#!/bin/bash
+
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
+cd ${HOME}/dev/src/github.com/humboldtux/scripts
+git remote set-url origin git@github.com:humboldtux/scripts.git
+
+cd ${HOME}/dev/src/github.com/humboldtux/cheats
+git remote set-url origin git@github.com:humboldtux/cheats.git
+
+git clone git@github.com:humboldtux/scripts-priv.git ${HOME}/dev/src/github.com/humboldtux/scripts-priv
+gita add ${HOME}/dev/src/github.com/humboldtux/scripts-priv
+
+git clone git@github.com:humboldtux/cheats-priv.git ${HOME}/dev/src/github.com/humboldtux/cheats-priv
+gita add ${HOME}/dev/src/github.com/humboldtux/cheats-priv
