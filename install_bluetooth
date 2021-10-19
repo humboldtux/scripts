@@ -1,0 +1,11 @@
+#!/bin/bash
+
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
+sudo apt-get install -y bluetooth bluez bluez-tools rfkill pulseaudio-module-bluetooth > /dev/null
+sudo sed -i s/AutoEnable=true/AutoEnable=false/g /etc/bluetooth/main.conf
+sudo systemctl --quiet start bluetooth.service
+sudo systemctl --quiet enable bluetooth.service
+sudo usermod -aG lp $USER
+newgrp lp
