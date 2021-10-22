@@ -80,7 +80,7 @@ for PLUGIN in ${ASDF_PLUGINS}; do
 done
 
 echo "Installation pkgs cargo"
-CARGO_PKGS="git-delta exa cargo-update topgrade"
+CARGO_PKGS="fd-find git-delta gitui exa cargo-update topgrade"
 for PKG in ${CARGO_PKGS}; do
   ${HOME}/.asdf/shims/cargo -q install ${PKG}
 done
