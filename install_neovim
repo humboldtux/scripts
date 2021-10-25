@@ -1,0 +1,24 @@
+#!/bin/bash
+
+#SETUP
+if [[ $1 == '-u' ]];then
+  WGET='wget -q -N' # only download if version is newer
+  PACKER_CMD='+PackerSync'
+else
+  WGET='wget -q --no-clobber' #only download if file does not exist
+  PACKER_CMD='+PackerInstall'
+fi
+
+${WGET} https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O ${HOME}/.local/bin/nvim
+chmod +x ${HOME}/.local/bin/nvim
+
+if [[ ! -d "${HOME}/.local/share/nvim/site/pack/packer/start/packer.nvim" ]]; then
+  echo "Installation plugin packer"
+  git clone --depth 1 https://github.com/wbthomason/packer.nvim \
+  ${HOME}/.local/share/nvim/site/pack/packer/start/packer.nvim
+elif [[ $1 == '-u' ]]; then
+  cd ${HOME}/.local/share/nvim/site/pack/packer/start/packer.nvim
+  git pull
+fi
+
+#${HOME}/.local/bin/nvim --headless ${PACKER_CMD} +qall > /dev/null
