@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source  ${HOME}/.bash_functions
+
 #SETUP
 if [[ $1 == '-u' ]];then
   WGET='wget -q -N' # only download if version is newer
@@ -23,6 +25,12 @@ fi
 
 #nvim --headless -c 'autocmd User PackerComplete quitall' -c "${PACKER_CMD}"
 
+echo "installation Rust LSP"
 curl -s -L https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-x86_64-unknown-linux-gnu.gz \
   --output - | gunzip > ${HOME}/.local/bin/rust-analyzer
 chmod u+x ${HOME}/.local/bin/rust-analyzer
+
+echo "installation Clang LSP"
+VERSION=`github_get_latest_version clangd/clangd`
+wget -q https://github.com/clangd/clangd/releases/latest/download/clangd-linux-${VERSION}.zip  -O /tmp/clangd.zip
+unzip -j -x /tmp/clangd.zip clangd_*/bin/clangd -d ${HOME}/.local/bin/
