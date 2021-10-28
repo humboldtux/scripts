@@ -22,3 +22,7 @@ elif [[ $1 == '-u' ]]; then
 fi
 
 #${HOME}/.local/bin/nvim --headless ${PACKER_CMD} +qall > /dev/null
+#${HOME}/.nix-profile/bin/nvim  +LspInstallInfo
+#ln -s /home/benben/.local/share/nvim/lsp_servers/clangd/clangd ~/.local/bin/.
+#{HOME/.asdf/shims/npm i -g bash-language-server
+#${HOME}/.nix-profile/bin/nix-env -i rust-analyzer
