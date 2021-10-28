@@ -3,10 +3,10 @@
 #SETUP
 if [[ $1 == '-u' ]];then
   WGET='wget -q -N' # only download if version is newer
-  PACKER_CMD='+PackerSync'
+  #PACKER_CMD='PackerSync'
 else
   WGET='wget -q --no-clobber' #only download if file does not exist
-  PACKER_CMD='+PackerInstall'
+  #PACKER_CMD='PackerInstall'
 fi
 
 ${WGET} https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O ${HOME}/.local/bin/nvim
@@ -21,8 +21,8 @@ elif [[ $1 == '-u' ]]; then
   git pull
 fi
 
-#${HOME}/.local/bin/nvim --headless ${PACKER_CMD} +qall > /dev/null
-#${HOME}/.nix-profile/bin/nvim  +LspInstallInfo
-#ln -s /home/benben/.local/share/nvim/lsp_servers/clangd/clangd ~/.local/bin/.
-#{HOME/.asdf/shims/npm i -g bash-language-server
-#${HOME}/.nix-profile/bin/nix-env -i rust-analyzer
+#nvim --headless -c 'autocmd User PackerComplete quitall' -c "${PACKER_CMD}"
+
+curl -s -L https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-x86_64-unknown-linux-gnu.gz \
+  --output - | gunzip > ${HOME}/.local/bin/rust-analyzer
+chmod u+x ${HOME}/.local/bin/rust-analyzer
