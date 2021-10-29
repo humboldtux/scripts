@@ -43,7 +43,7 @@ if [[ ! -d "${HOME}/.local/share/fonts/NerdFonts" ]];then
    svn export https://github.com/ryanoasis/nerd-fonts/trunk/patched-fonts/JetBrainsMono > /dev/null
    cd /tmp/nerd-fonts/
    wget -q https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/install.sh
-   bash install.sh JetBrainsMono > /dev/null
+   bash install.sh Hack > /dev/null
 fi
 
 if [[ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]];then
@@ -133,5 +133,5 @@ if [[ ! -d "${HOME}/.cache/wal" ]];then
   ${HOME}/.local/bin/wal -q --theme vscode
 fi
 
-${HOME}/dev/src/github.com/humboldtux/scripts/vim_pluginstall
-${HOME}/dev/src/github.com/humboldtux/scripts/vim_pluginstall
+#${HOME}/dev/src/github.com/humboldtux/scripts/vim_pluginstall
+#${HOME}/dev/src/github.com/humboldtux/scripts/vim_pluginstall
