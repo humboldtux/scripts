@@ -40,7 +40,7 @@ if [[ ! -d "${HOME}/.local/share/fonts/NerdFonts" ]];then
    sudo apt-get install -y subversion-tools > /dev/null
    mkdir -p /tmp/nerd-fonts/patched-fonts
    cd /tmp/nerd-fonts/patched-fonts
-   svn export https://github.com/ryanoasis/nerd-fonts/trunk/patched-fonts/JetBrainsMono > /dev/null
+   svn export https://github.com/ryanoasis/nerd-fonts/trunk/patched-fonts/Hack > /dev/null
    cd /tmp/nerd-fonts/
    wget -q https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/install.sh
    bash install.sh Hack > /dev/null
