@@ -3,13 +3,14 @@
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
-nameCMD="${1}"
+CMD="${1}"
 NAME="${2}"
 ARTICLE_DIR="${HOME}/dev/src/github.com/humboldtux-articles/${NAME}"
 GLMF_REPO="${HOME}/dev/src/github.com/GLMF/outils_auteurs"
 
 function diamond_install() {
-  #brew install pandoc
+  #On install pandoc via nix-env, pourpandoc > 2.10
+  nix-env -i pandoc
   if [[ ! -d ${GLMF_REPO} ]]; then
     git clone https://github.com/GLMF/outils_auteurs.git ${GLMF_REPO}
   fi
@@ -24,16 +25,20 @@ diamond_new() {
   echo "build/*" > .gitignore
   echo "cache/*" >> .gitignore
   git init
-  git remote add origin git@github.com:humboldtux-articles/${NAME}.git
   git add .
   git commit -m'Initial commit'
-  git push --set-upstream origin master
+
   MODELE=`find ${GLMF_REPO}/Markdown/md-auteur/pandoc-md-auteur/modeles/ -type f -name "modele*template" -execdir basename {} .template ';' | fzf`
   echo "export DIAMOND_MODELE=${MODELE}" > .envrc
   direnv allow
   git add .envrc
   git commit -m"Ajout DIAMOND_MODELE env var"
-  git push
+
+  printf "\n\n\nCréez le dépôt humboldtux-articles/${NAME} sur Github" 
+  read
+  git remote add origin git@github.com:humboldtux-articles/${NAME}.git
+  git branch -M main
+  git push -u origin main
 }
 
 diamond_pandoc() {
