@@ -14,7 +14,7 @@ fi
 PKGS="atool backupninja build-essential curl detox dkms dos2unix firmware-linux firmware-linux-free firmware-linux-nonfree \
   ftp gdebi git jq kitty kitty-terminfo ldap-utils libproxychains4 libssl-dev linux-headers-amd64 locate \
   mariadb-client needrestart newsboat odt2txt okular openvpn pdftk pkg-config poppler-utils putty-tools \
-  python3-ldap python3-pil python3-pip python3-venv ranger rdiff-backup rsync ruby-dev samba-common strace \
+  python3-ldap python3-pil python3-pip python3-venv ranger resolvconf rdiff-backup rsync ruby-dev samba-common strace \
   sudo tcpdump tig tshark unrar vim w3m xorriso clang clang-tools lldb"
 
 echo "Installation APT: ${PKGS}"
