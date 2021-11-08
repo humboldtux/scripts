@@ -34,3 +34,6 @@ echo "installation Clang LSP"
 VERSION=`github_get_latest_version clangd/clangd`
 wget -q https://github.com/clangd/clangd/releases/latest/download/clangd-linux-${VERSION}.zip  -O /tmp/clangd.zip
 unzip -j -x /tmp/clangd.zip clangd_*/bin/clangd -d ${HOME}/.local/bin/
+
+echo "installation Lua LSP"
+nix-env -i sumneko-lua-language-server && sudo ln -s ${HOME}/.nix-profile/bin/lua-language-server /usr/local/bin/.
