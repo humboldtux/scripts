@@ -37,3 +37,8 @@ unzip -j -x /tmp/clangd.zip clangd_*/bin/clangd -d ${HOME}/.local/bin/
 
 echo "installation Lua LSP"
 nix-env -i sumneko-lua-language-server && sudo ln -s ${HOME}/.nix-profile/bin/lua-language-server /usr/local/bin/.
+
+echo "Installation yaml LSP"
+npm install --global yarn
+yarn global add yaml-language-server
+asdf reshim nodejs
