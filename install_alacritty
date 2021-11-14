@@ -1,0 +1,10 @@
+#!/bin/bash
+
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
+source ${HOME}/.bash_functions
+
+echo "Installation alacritty"
+github_dld_latest_releases barnumbirr/alacritty-debian
+sudo apt-get install -y /tmp/*alacritty*deb > /dev/null
