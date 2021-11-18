@@ -42,3 +42,7 @@ echo "Installation yaml LSP"
 npm install --global yarn
 yarn global add yaml-language-server
 asdf reshim nodejs
+
+echo "install bash LSP"
+npm i -g bash-language-server
+asdf reshim nodejs
