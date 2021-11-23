@@ -3,20 +3,6 @@
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
-if ! dpkg-query -W -f='${Status}' deb-multimedia-keyring > /dev/null
-then
-  echo "Installation deb-multimedia-keyring"
-  wget -q http://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2016.8.1_all.deb -O /tmp/deb-multimedia-keyring.deb
-  sudo apt-get install -y /tmp/deb-multimedia-keyring.deb > /dev/null
-fi
-CODENAME=`lsb_release -sc`
-if [[ ! -f "/etc/apt/sources.list.d/deb-multimedia.list" ]]; then
-  echo "Installation depot multimedia"
-  echo "deb https://www.deb-multimedia.org ${CODENAME} main non-free" | sudo tee -a /etc/apt/sources.list.d/deb-multimedia.list
-  echo "deb https://www.deb-multimedia.org ${CODENAME}-backports main" | sudo tee -a /etc/apt/sources.list.d/deb-multimedia.list
-  sudo apt-get update > /dev/null ; sudo apt-get upgrade -y > /dev/null
-fi
-
 echo "Installation Multimedia"
-sudo apt-get install -y vlc vlc-plugin-base libnfs13 handbrake* libdvdnav4 libdvd-pkg libdvdread8 libdvd-pkg mpv
+sudo apt-get install -y vlc vlc-plugin-base libnfs13 handbrake* libdvdnav4 libdvd-pkg libdvdread8 libdvd-pkg mpv guvcview
 sudo dpkg-reconfigure libdvd-pkg
