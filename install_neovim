@@ -25,6 +25,8 @@ fi
 
 #nvim --headless -c 'autocmd User PackerComplete quitall' -c "${PACKER_CMD}"
 
+sudo apt-get install -y exuberant-ctags 2> /dev/null
+
 echo "installation Rust LSP"
 curl -s -L https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-x86_64-unknown-linux-gnu.gz \
   --output - | gunzip > ${HOME}/.local/bin/rust-analyzer
