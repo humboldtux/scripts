@@ -43,8 +43,12 @@ nix-env -i sumneko-lua-language-server && sudo ln -s ${HOME}/.nix-profile/bin/lu
 echo "Installation yaml LSP"
 npm install --global yarn
 yarn global add yaml-language-server
-asdf reshim nodejs
 
 echo "install bash LSP"
 npm i -g bash-language-server
+
+echo "Install TOML LSP"
+cargo install taplo-lsp 2&>1 /dev/null 
+
 asdf reshim nodejs
+asdf reshim rust
