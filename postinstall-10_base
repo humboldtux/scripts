@@ -145,6 +145,6 @@ if [[ ! -d "${HOME}/.local/share/yadm/repo.git" ]];then
   ${HOME}/.nix-profile/bin/yadm reset --hard
 fi
 
-if [[ ! -d "${HOME}/.cache/wal" ]];then
-  ${HOME}/.local/bin/wal -q --theme vscode
-fi
+#if [[ ! -d "${HOME}/.cache/wal" ]];then
+#  ${HOME}/.local/bin/wal -q --theme vscode
+#fi
