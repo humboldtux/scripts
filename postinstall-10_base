@@ -2,149 +2,157 @@
 
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
-
-CODENAME=`lsb_release -sc`
-
+CODENAME=$(lsb_release -sc)
 
 if [[ ! -f "/etc/apt/sources.list.d/backports.list" ]]; then
-  echo "Activation des dépôts backports"
-  echo "deb http://deb.debian.org/debian ${CODENAME}-backports main contrib non-free" | sudo tee -a /etc/apt/sources.list.d/backports.list
-  sudo apt-get update > /dev/null
+	echo "Activation des dépôts backports"
+	echo "deb http://deb.debian.org/debian ${CODENAME}-backports main contrib non-free" | sudo tee -a /etc/apt/sources.list.d/backports.list
+	sudo apt-get update >/dev/null
 fi
 
-if ! dpkg-query -W -f='${Status}' deb-multimedia-keyring > /dev/null
-then
-  echo "Installation deb-multimedia-keyring"
-  wget -q http://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2016.8.1_all.deb -O /tmp/deb-multimedia-keyring.deb
-  sudo apt-get install -y /tmp/deb-multimedia-keyring.deb > /dev/null
+if ! dpkg-query -W -f='${Status}' deb-multimedia-keyring >/dev/null; then
+	echo "Installation deb-multimedia-keyring"
+	wget -q http://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2016.8.1_all.deb -O /tmp/deb-multimedia-keyring.deb
+	sudo apt-get install -y /tmp/deb-multimedia-keyring.deb >/dev/null
 fi
 
-CODENAME=`lsb_release -sc`
 if [[ ! -f "/etc/apt/sources.list.d/deb-multimedia.list" ]]; then
-  echo "Installation depot multimedia"
-  echo "deb https://www.deb-multimedia.org ${CODENAME} main non-free" | sudo tee -a /etc/apt/sources.list.d/deb-multimedia.list
-  echo "deb https://www.deb-multimedia.org ${CODENAME}-backports main" | sudo tee -a /etc/apt/sources.list.d/deb-multimedia.list
-  sudo apt-get update > /dev/null
+	echo "Installation depot multimedia"
+	echo "deb https://www.deb-multimedia.org ${CODENAME} main non-free" | sudo tee -a /etc/apt/sources.list.d/deb-multimedia.list
+	echo "deb https://www.deb-multimedia.org ${CODENAME}-backports main" | sudo tee -a /etc/apt/sources.list.d/deb-multimedia.list
+	sudo apt-get update >/dev/null
 fi
 
 PKGS="atool backupninja build-essential curl detox dkms dos2unix ffmpeg ffmpegthumbnailer firmware-linux firmware-linux-free firmware-linux-nonfree \
-  ftp gdebi git jq kitty kitty-terminfo ldap-utils libproxychains4 libssl-dev linux-headers-amd64 locate \
-  mariadb-client needrestart neofetch newsboat odt2txt okular openvpn pdftk pkg-config poppler-utils putty-tools \
-  python3-ldap python3-pil python3-pip python3-venv proxychains4 ranger rdiff-backup rsync ruby-dev samba-common strace \
+  ftp gdebi git jq kitty kitty-terminfo ldap-utils libproxychains4 libssl-dev libx11-dev linux-headers-amd64 locate \
+  mariadb-client needrestart neofetch newsboat notcurses-bin odt2txt okular openvpn pdftk pkg-config poppler-utils putty-tools \
+  python3-ldap python3-pil python3-pip python3-venv proxychains4 ranger rdiff-backup rsync ruby-dev ruby-notify samba-common shellcheck strace \
   sudo tcpdump tig tshark unrar vim w3m xorriso clang clang-tools lldb"
 
 echo "Installation APT: ${PKGS}"
-sudo apt-get -y install ${PKGS} > /dev/null
+sudo apt-get -y install ${PKGS} >/dev/null
 
-python3 -m pip install --user pipx > /dev/null
+python3 -m pip install --user pipx >/dev/null
 export PATH="$PATH:${HOME}/.local/bin"
 
 PIPX_PKGS="gita updog pywal mdcat yt-dlp diffoscope reindent pywhat"
 echo "Installation logiciels pipx: ${PIPX_PKGS}"
 for PKG in ${PIPX_PKGS}; do
-  if [[ ! -d "${HOME}/.local/pipx/venvs/${PKG}" ]];then
-    pipx install ${PKG} > /dev/null
-  fi
+	if [[ ! -d "${HOME}/.local/pipx/venvs/${PKG}" ]]; then
+		pipx install ${PKG} >/dev/null
+	fi
 done
 if [[ ! -f "/etc/bash_completion.d/gita" ]]; then
-  sudo wget -q https://raw.githubusercontent.com/nosarthur/gita/master/.gita-completion.bash -O /etc/bash_completion.d/gita
+	sudo wget -q https://raw.githubusercontent.com/nosarthur/gita/master/.gita-completion.bash -O /etc/bash_completion.d/gita
 fi
 PATH=${HOME}/.local/bin:${PATH}
 
-if [[ ! -d "${HOME}/.local/share/fonts/NerdFonts" ]];then
-  echo "Installing Nerd Fonts"
-   sudo apt-get install -y subversion-tools > /dev/null
-   mkdir -p /tmp/nerd-fonts/patched-fonts
-   cd /tmp/nerd-fonts/patched-fonts
-   svn export https://github.com/ryanoasis/nerd-fonts/trunk/patched-fonts/JetBrainsMono > /dev/null
-   cd /tmp/nerd-fonts/
-   wget -q https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/install.sh
-   bash install.sh JetBrainsMono > /dev/null
+if [[ ! -d "${HOME}/.local/share/fonts/NerdFonts" ]]; then
+	echo "Installing Nerd Fonts"
+	sudo apt-get install -y subversion-tools >/dev/null
+	mkdir -p /tmp/nerd-fonts/patched-fonts
+	cd /tmp/nerd-fonts/patched-fonts
+	svn export https://github.com/ryanoasis/nerd-fonts/trunk/patched-fonts/JetBrainsMono >/dev/null
+	cd /tmp/nerd-fonts/
+	wget -q https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/install.sh
+	bash install.sh JetBrainsMono >/dev/null
 fi
 
-if [[ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]];then
-  echo "Installation nix"
-  curl -sSL https://nixos.org/nix/install | sh
-. ${HOME}/.nix-profile/etc/profile.d/nix.sh
+if [[ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]]; then
+	echo "Installation nix"
+	curl -sSL https://nixos.org/nix/install | sh
+	. ${HOME}/.nix-profile/etc/profile.d/nix.sh
 fi
 NIX_PKGS="bash-completion bat broot delta direnv docker-compose dust \
   fzf icdiff miller navi starship viu xsv ripgrep grex yadm zoxide swaks"
 
 sudo -E sh -c 'echo 1 > /proc/sys/vm/overcommit_memory' # probleme memoire
 for PKG in ${NIX_PKGS}; do
-  if [[ ! -L "${HOME}/.nix-profile/bin/${PKG}" ]]; then
-    echo "Installation pkg nix ${PKG}"
-    ${HOME}/.nix-profile/bin/nix-env --quiet -i ${PKG} > /dev/null
-  fi
+	if [[ ! -L "${HOME}/.nix-profile/bin/${PKG}" ]]; then
+		echo "Installation pkg nix ${PKG}"
+		${HOME}/.nix-profile/bin/nix-env --quiet -i ${PKG} >/dev/null
+	fi
 done
-if [[ ! -f "${HOME}/.config/broot/launcher/bash/br" ]];then
-  ${HOME}/.nix-profile/bin/broot --install
+if [[ ! -f "${HOME}/.config/broot/launcher/bash/br" ]]; then
+	${HOME}/.nix-profile/bin/broot --install
 fi
 
-if [[ ! -d "${HOME}/.asdf" ]];then
-  echo "Installation ASDF"
-  git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf > /dev/null && cd ${HOME}/.asdf && git checkout "$(git describe --abbrev=0 --tags)" > /dev/null
-  . "${HOME}/.asdf/asdf.sh"
+if [[ ! -d "${HOME}/.asdf" ]]; then
+	echo "Installation ASDF"
+	git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf >/dev/null && cd ${HOME}/.asdf && git checkout "$(git describe --abbrev=0 --tags)" >/dev/null
+	. "${HOME}/.asdf/asdf.sh"
 fi
 echo "Installation plugins ASDF"
 ASDF_PLUGINS="golang rust nodejs"
 for PLUGIN in ${ASDF_PLUGINS}; do
-  ${HOME}/.asdf/bin/asdf plugin add ${PLUGIN} > /dev/null
-  ${HOME}/.asdf/bin/asdf install ${PLUGIN} latest > /dev/null
-  printf "ASDF: Installation version"
-  ${HOME}/.asdf/bin/asdf global ${PLUGIN} `asdf latest ${PLUGIN}` > /dev/null
+	${HOME}/.asdf/bin/asdf plugin add ${PLUGIN} >/dev/null
+	${HOME}/.asdf/bin/asdf install ${PLUGIN} latest >/dev/null
+	printf "ASDF: Installation version"
+	${HOME}/.asdf/bin/asdf global ${PLUGIN} $(asdf latest ${PLUGIN}) >/dev/null
 done
 
 echo "Installation pkgs cargo"
-CARGO_PKGS="cargo-add cargo-update cargo-watch fd-find git-delta gitui exa topgrade zellij"
+CARGO_PKGS="cargo-edit cargo-update cargo-watch fd-find git-delta gitui exa shellharden topgrade zellij"
 for PKG in ${CARGO_PKGS}; do
-  ${HOME}/.asdf/shims/cargo -q install ${PKG}
+	${HOME}/.asdf/shims/cargo -q install ${PKG}
 done
+${HOME}/.asdf/shims/cargo -q install nu --features=extra
 ${HOME}/.asdf/bin/asdf reshim rust
 
-PKGS_GO="github.com/akavel/up"
+PKGS_GO="github.com/akavel/up \
+  mvdan.cc/sh/v3/cmd/shfmt \
+  github.com/jesseduffield/lazygit"
 echo "Installation go get"
 for PKG in ${PKGS_GO}; do
-  ${HOME}/.asdf/shims/go install ${PKG}@latest
+	${HOME}/.asdf/shims/go install ${PKG}@latest
 done
 
 if [[ ! -d ${HOME}/dev/src/github.com/humboldtux ]]; then
-  mkdir -p ${HOME}/{bin,dev,pkg} \
-    ${HOME}/dev/src/github.com/humboldtux
+	mkdir -p ${HOME}/{bin,dev,pkg} \
+		${HOME}/dev/src/github.com/humboldtux
 fi
 
-git clone https://github.com/humboldtux/cheats ${HOME}/dev/src/github.com/humboldtux/cheats 2> /dev/null
-git clone https://github.com/humboldtux/scripts ${HOME}/dev/src/github.com/humboldtux/scripts 2> /dev/null
-${HOME}/.local/bin/gita add ${HOME}/dev/src/github.com/humboldtux/*
+git clone https://github.com/humboldtux/cheats ${HOME}/dev/src/github.com/humboldtux/cheats 2>/dev/null
+git clone https://github.com/humboldtux/scripts ${HOME}/dev/src/github.com/humboldtux/scripts 2>/dev/null
+${HOME}/.local/bin/gita add ${HOME}/dev/src/github.com/humboldtux/{cheats,scripts}*
 
-if ! dpkg-query -W -f='${Status}' sysdig > /dev/null
-then
-  echo "Installation sysdig"
-  curl -sSL https://s3.amazonaws.com/download.draios.com/stable/install-sysdig | sudo bash
+if ! dpkg-query -W -f='${Status}' sysdig >/dev/null; then
+	echo "Installation sysdig"
+	curl -sSL https://s3.amazonaws.com/download.draios.com/stable/install-sysdig | sudo bash
 fi
 
-if ! dpkg-query -W -f='${Status}' docker-ce > /dev/null
-then
-  echo "Installation Docker"
-  curl -sSL https://get.docker.com/ | sh
-  sudo usermod -aG docker $USER > /dev/null
-  sudo systemctl -q enable docker
-  sudo systemctl -q restart docker
+if ! dpkg-query -W -f='${Status}' docker-ce >/dev/null; then
+	echo "Installation Docker"
+	curl -sSL https://get.docker.com/ | sh
+	sudo usermod -aG docker $USER >/dev/null
+	sudo systemctl -q enable docker
+	sudo systemctl -q restart docker
 fi
 
 if [[ ! -f "/etc/apt/sources.list.d/microsoft.list" ]]; then
-  echo "Installation Powershell"
-  curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-  echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-${CODENAME}-prod ${CODENAME} main" | sudo tee -a /etc/apt/sources.list.d/microsoft.list
+	echo "Installation Powershell"
+	curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+	echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-${CODENAME}-prod ${CODENAME} main" | sudo tee -a /etc/apt/sources.list.d/microsoft.list
 fi
-sudo apt-get update > /dev/null ; sudo apt-get install -y powershell gss-ntlmssp > /dev/null
+sudo apt-get update >/dev/null
+sudo apt-get install -y powershell gss-ntlmssp >/dev/null
 
-if [[ ! -d "${HOME}/.local/share/yadm/repo.git" ]];then
-  echo "Installation Yadm"
-  ${HOME}/.nix-profile/bin/yadm clone "https://github.com/humboldtux/dotfiles.git"
-  ${HOME}/.nix-profile/bin/yadm reset --hard
+if [[ ! -d "${HOME}/.local/share/yadm/repo.git" ]]; then
+	echo "Installation Yadm"
+	${HOME}/.nix-profile/bin/yadm clone "https://github.com/humboldtux/dotfiles.git"
+	${HOME}/.nix-profile/bin/yadm reset --hard
 fi
 
 #if [[ ! -d "${HOME}/.cache/wal" ]];then
 #  ${HOME}/.local/bin/wal -q --theme vscode
 #fi
+
+if [[ ! -d ${HOME}/dev/src/github.com/AdnanHodzic/auto-cpufreq ]]; then
+	echo "auto-cpufreq"
+	mkdir -p ${HOME}/dev/src/github.com/AdnanHodzic/auto-cpufreq
+	git clone https://github.com/AdnanHodzic/auto-cpufreq.git ${HOME}/dev/src/github.com/AdnanHodzic/auto-cpufreq
+	cd ${HOME}/dev/src/github.com/AdnanHodzic/auto-cpufreq
+	gita add .
+	sudo ./auto-cpufreq-installer --install
+	sudo auto-cpufreq --install
+fi
