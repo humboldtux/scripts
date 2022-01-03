@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [[ ! -d ${HOME}/dev/src/github.com/AdnanHodzic/auto-cpufreq ]]; then
+	echo "auto-cpufreq"
+	mkdir -p ${HOME}/dev/src/github.com/AdnanHodzic/auto-cpufreq
+	git clone https://github.com/AdnanHodzic/auto-cpufreq.git ${HOME}/dev/src/github.com/AdnanHodzic/auto-cpufreq
+	cd ${HOME}/dev/src/github.com/AdnanHodzic/auto-cpufreq
+	gita add .
+	sudo ./auto-cpufreq-installer --install
+	sudo auto-cpufreq --install
+fi
