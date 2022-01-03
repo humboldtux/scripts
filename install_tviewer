@@ -3,11 +3,11 @@
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
-if ! dpkg-query -W -f='${Status}' teamviewer > /dev/null
-then
-  echo "Installation Teamviewer"
-  wget -q https://download.teamviewer.com/download/linux/teamviewer_amd64.deb -O /tmp/teamviewer_amd64.deb
-  sudo apt-get install -y /tmp/teamviewer_amd64.deb > /dev/null
-  sudo systemctl disable teamviewerd.service
-  sudo systemctl stop teamviewerd.service
+if ! dpkg-query -W -f='${Status}' teamviewer >/dev/null; then
+	echo "Installation Teamviewer"
+	wget -q https://download.teamviewer.com/download/linux/teamviewer_amd64.deb -O /tmp/teamviewer_amd64.deb
+	sudo apt-get install -y /tmp/teamviewer_amd64.deb >/dev/null
 fi
+
+sudo systemctl disable teamviewerd.service
+sudo systemctl stop teamviewerd.service
