@@ -92,7 +92,7 @@ for PLUGIN in ${ASDF_PLUGINS}; do
 done
 
 echo "Installation pkgs cargo"
-CARGO_PKGS="cargo-edit cargo-update cargo-watch fd-find git-delta gitui exa shellharden topgrade zellij"
+CARGO_PKGS="cargo-edit cargo-update cargo-watch fd-find git-delta gitui exa shellharden skim topgrade zellij"
 for PKG in ${CARGO_PKGS}; do
 	${HOME}/.asdf/shims/cargo -q install ${PKG}
 done
