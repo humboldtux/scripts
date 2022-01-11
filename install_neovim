@@ -48,7 +48,7 @@ echo "install bash LSP"
 npm i -g bash-language-server
 
 echo "Install TOML LSP"
-cargo install taplo-lsp 2 /dev/null &>1
+cargo install taplo-lsp >/dev/null
 
 echo "Install formatters"
 echo " Install Stylua"
