@@ -24,17 +24,19 @@ if [[ ! -f "/etc/apt/sources.list.d/deb-multimedia.list" ]]; then
 fi
 
 PKGS="atool backupninja build-essential curl detox dkms dos2unix ffmpeg ffmpegthumbnailer firmware-linux firmware-linux-free firmware-linux-nonfree \
-  ftp gdebi git jq kitty kitty-terminfo ldap-utils libproxychains4 libssl-dev libx11-dev linux-headers-amd64 locate \
+  ftp gdebi git jq ldap-utils libproxychains4 libssl-dev libx11-dev linux-headers-amd64 locate \
   mariadb-client needrestart neofetch newsboat notcurses-bin odt2txt okular openvpn pdftk pkg-config poppler-utils putty-tools \
   python3-ldap python3-pil python3-pip python3-venv proxychains4 ranger rdiff-backup rsync ruby-dev ruby-notify samba-common shellcheck strace \
   sudo tcpdump tig tshark unrar vim w3m xorriso clang clang-tools lldb"
-
 echo "Installation APT: ${PKGS}"
 sudo apt-get -y install ${PKGS} >/dev/null
 
+PKGS="golang"
+echo "Installation APT backports: ${PKGS}"
+sudo apt-get -y install ${PKGS} -t bullseye-backports >/dev/null
+
 python3 -m pip install --user pipx >/dev/null
 export PATH="$PATH:${HOME}/.local/bin"
-
 PIPX_PKGS="gita updog pywal mdcat yt-dlp diffoscope reindent pywhat"
 echo "Installation logiciels pipx: ${PIPX_PKGS}"
 for PKG in ${PIPX_PKGS}; do
@@ -63,8 +65,8 @@ if [[ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]]; then
 	curl -sSL https://nixos.org/nix/install | sh
 	. ${HOME}/.nix-profile/etc/profile.d/nix.sh
 fi
-NIX_PKGS="bash-completion bat broot delta direnv docker-compose dust \
-  fzf icdiff miller navi starship viu xsv ripgrep grex yadm zoxide swaks"
+NIX_PKGS="bash-completion delta direnv docker-compose dust \
+  fzf icdiff miller navi yadm swaks"
 
 sudo -E sh -c 'echo 1 > /proc/sys/vm/overcommit_memory' # probleme memoire
 for PKG in ${NIX_PKGS}; do
@@ -77,27 +79,32 @@ if [[ ! -f "${HOME}/.config/broot/launcher/bash/br" ]]; then
 	${HOME}/.nix-profile/bin/broot --install
 fi
 
-if [[ ! -d "${HOME}/.asdf" ]]; then
-	echo "Installation ASDF"
-	git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf >/dev/null && cd ${HOME}/.asdf && git checkout "$(git describe --abbrev=0 --tags)" >/dev/null
-	. "${HOME}/.asdf/asdf.sh"
-fi
-echo "Installation plugins ASDF"
-ASDF_PLUGINS="golang rust nodejs"
-for PLUGIN in ${ASDF_PLUGINS}; do
-	${HOME}/.asdf/bin/asdf plugin add ${PLUGIN} >/dev/null
-	${HOME}/.asdf/bin/asdf install ${PLUGIN} latest >/dev/null
-	printf "ASDF: Installation version"
-	${HOME}/.asdf/bin/asdf global ${PLUGIN} $(asdf latest ${PLUGIN}) >/dev/null
-done
+#if [[ ! -d "${HOME}/.asdf" ]]; then
+#	echo "Installation ASDF"
+#	git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf >/dev/null && cd ${HOME}/.asdf && git checkout "$(git describe --abbrev=0 --tags)" >/dev/null
+#	. "${HOME}/.asdf/asdf.sh"
+#fi
+#echo "Installation plugins ASDF"
+#ASDF_PLUGINS="golang rust nodejs"
+#for PLUGIN in ${ASDF_PLUGINS}; do
+#	${HOME}/.asdf/bin/asdf plugin add ${PLUGIN} >/dev/null
+#	${HOME}/.asdf/bin/asdf install ${PLUGIN} latest >/dev/null
+#	printf "ASDF: Installation version"
+#	${HOME}/.asdf/bin/asdf global ${PLUGIN} $(asdf latest ${PLUGIN}) >/dev/null
+#done
+
+/usr/bin/curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -q -y
+source $HOME/.cargo/env
 
 echo "Installation pkgs cargo"
-CARGO_PKGS="cargo-edit cargo-update cargo-watch fd-find git-delta gitui exa shellharden skim topgrade zellij"
+CARGO_PKGS="bat broot cargo-edit cargo-update cargo-watch exa \
+	fd-find git-delta gitui ripgrep shellharden \
+	skim starship topgrade viu xsv zoxide"
 for PKG in ${CARGO_PKGS}; do
-	${HOME}/.asdf/shims/cargo -q install ${PKG}
+	"  pkg ${PKG}"
+	cargo -q install ${PKG}
 done
-${HOME}/.asdf/shims/cargo -q install nu --features=extra
-${HOME}/.asdf/bin/asdf reshim rust
+cargo -q install nu --features=extra
 
 PKGS_GO="github.com/akavel/up \
   mvdan.cc/sh/v3/cmd/shfmt \
