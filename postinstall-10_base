@@ -76,7 +76,7 @@ for PKG in ${NIX_PKGS}; do
 	fi
 done
 if [[ ! -f "${HOME}/.config/broot/launcher/bash/br" ]]; then
-	${HOME}/.nix-profile/bin/broot --install
+	broot --install
 fi
 
 #if [[ ! -d "${HOME}/.asdf" ]]; then
@@ -101,7 +101,7 @@ CARGO_PKGS="bat broot cargo-edit cargo-update cargo-watch exa \
 	fd-find git-delta gitui ripgrep shellharden \
 	skim starship topgrade viu xsv zoxide"
 for PKG in ${CARGO_PKGS}; do
-	"  pkg ${PKG}"
+	echo "  pkg ${PKG}"
 	cargo -q install ${PKG}
 done
 cargo -q install nu --features=extra
@@ -111,7 +111,7 @@ PKGS_GO="github.com/akavel/up \
   github.com/jesseduffield/lazygit"
 echo "Installation go get"
 for PKG in ${PKGS_GO}; do
-	${HOME}/.asdf/shims/go install ${PKG}@latest
+	/usr/bin/go install ${PKG}@latest
 done
 
 if [[ ! -d ${HOME}/dev/src/github.com/humboldtux ]]; then

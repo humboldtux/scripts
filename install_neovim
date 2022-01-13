@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ${HOME}/.bash_functions
+source "$HOME"/.bash_functions
 
 #SETUP
 if [[ $1 == '-u' ]]; then
@@ -11,48 +11,46 @@ else
 	#PACKER_CMD='PackerInstall'
 fi
 
-${WGET} https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O ${HOME}/.local/bin/nvim
-chmod +x ${HOME}/.local/bin/nvim
+"$WGET" https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O "$HOME"/.local/bin/nvim
+chmod +x "$HOME"/.local/bin/nvim
 
-if [[ ! -d "${HOME}/.local/share/nvim/site/pack/packer/start/packer.nvim" ]]; then
-	echo "Installation plugin packer"
-	git clone --depth 1 https://github.com/wbthomason/packer.nvim \
-		${HOME}/.local/share/nvim/site/pack/packer/start/packer.nvim
-elif [[ $1 == '-u' ]]; then
-	cd ${HOME}/.local/share/nvim/site/pack/packer/start/packer.nvim
-	git pull
-fi
+#if [[ ! -d "$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim" ]]; then
+#	echo "Installation plugin packer"
+#	git clone --depth 1 https://github.com/wbthomason/packer.nvim \
+#	"$HOME"/.local/share/nvim/site/pack/packer/start/packer.nvim
+#elif [[ $1 == '-u' ]]; then
+#	cd "$HOME"/.local/share/nvim/site/pack/packer/start/packer.nvim
+#	git pull
+#fi
 
 #nvim --headless -c 'autocmd User PackerComplete quitall' -c "${PACKER_CMD}"
 
 sudo apt-get install -y exuberant-ctags 2>/dev/null
 
-echo "installation Rust LSP"
-curl -s -L https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-x86_64-unknown-linux-gnu.gz \
-	--output - | gunzip >${HOME}/.local/bin/rust-analyzer
-chmod u+x ${HOME}/.local/bin/rust-analyzer
+#echo "installation Rust LSP"
+#curl -s -L https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-x86_64-unknown-linux-gnu.gz \
+#	--output - | gunzip >"$HOME"/.local/bin/rust-analyzer
+#chmod u+x "$HOME"/.local/bin/rust-analyzer
 
-echo "installation Clang LSP"
-VERSION=$(github_get_latest_version clangd/clangd)
-wget -q https://github.com/clangd/clangd/releases/latest/download/clangd-linux-${VERSION}.zip -O /tmp/clangd.zip
-unzip -j -x /tmp/clangd.zip clangd_*/bin/clangd -d ${HOME}/.local/bin/
+#echo "installation Clang LSP"
+#VERSION=$(github_get_latest_version clangd/clangd)
+#wget -q https://github.com/clangd/clangd/releases/latest/download/clangd-linux-"$VERSION".zip -O /tmp/clangd.zip
+#unzip -j -x /tmp/clangd.zip clangd_*/bin/clangd -d "$HOME"/.local/bin/
 
-echo "installation Lua LSP"
-nix-env -i sumneko-lua-language-server && sudo ln -s ${HOME}/.nix-profile/bin/lua-language-server /usr/local/bin/.
+#echo "installation Lua LSP"
+#nix-env -i sumneko-lua-language-server && sudo ln -s "$HOME"/.nix-profile/bin/lua-language-server /usr/local/bin/.
 
-echo "Installation yaml LSP"
-npm install --global yarn
-yarn global add yaml-language-server
+#echo "Installation yaml LSP"
+#npm install --global yarn
+#yarn global add yaml-language-server
 
-echo "install bash LSP"
-npm i -g bash-language-server
+#echo "install bash LSP"
+#npm i -g bash-language-server
 
 echo "Install TOML LSP"
-cargo install taplo-lsp >/dev/null
+cargo -q install taplo-lsp
+cargo -q install taplo-cli
 
 echo "Install formatters"
 echo " Install Stylua"
-cargo install stylua
-
-asdf reshim nodejs
-asdf reshim rust
+cargo -q install stylua
