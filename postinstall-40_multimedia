@@ -6,3 +6,7 @@ export NEEDRESTART_MODE=a
 echo "Installation Multimedia"
 sudo apt-get install -y vlc vlc-plugin-base libnfs13 handbrake* libdvdnav4 libdvd-pkg libdvdread8 libdvd-pkg mpv guvcview v4l2loopback-dkms v4l-utils
 sudo dpkg-reconfigure libdvd-pkg
+
+echo "installation songrec"
+sudo apt install build-essential libasound2-dev libgtk-3-dev libssl-dev -y
+cargo install songrec

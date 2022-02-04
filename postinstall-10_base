@@ -195,6 +195,7 @@ CARGO_PKGS=(
 	skim
 	starship
 	topgrade
+	tre-command
 	viu
 	xh
 	xsv
