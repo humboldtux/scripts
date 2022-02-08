@@ -25,6 +25,8 @@ fi
 
 PKGS=(
 	atool
+	anacron
+	apticron
 	backupninja
 	build-essential
 	clang
