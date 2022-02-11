@@ -55,7 +55,9 @@ PKGS=(
 	needrestart
 	neofetch
 	newsboat
+	nodejs
 	notcurses-bin
+	npm
 	odt2txt
 	okular
 	openvpn
@@ -157,20 +159,6 @@ done
 if [[ ! -f "$HOME/.config/broot/launcher/bash/br" ]]; then
 	broot --install
 fi
-
-#if [[ ! -d "${HOME}/.asdf" ]]; then
-#	echo "Installation ASDF"
-#	git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf >/dev/null && cd ${HOME}/.asdf && git checkout "$(git describe --abbrev=0 --tags)" >/dev/null
-#	. "${HOME}/.asdf/asdf.sh"
-#fi
-#echo "Installation plugins ASDF"
-#ASDF_PLUGINS="golang rust nodejs"
-#for PLUGIN in ${ASDF_PLUGINS}; do
-#	${HOME}/.asdf/bin/asdf plugin add ${PLUGIN} >/dev/null
-#	${HOME}/.asdf/bin/asdf install ${PLUGIN} latest >/dev/null
-#	printf "ASDF: Installation version"
-#	${HOME}/.asdf/bin/asdf global ${PLUGIN} $(asdf latest ${PLUGIN}) >/dev/null
-#done
 
 /usr/bin/curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -q -y
 source "$HOME"/.cargo/env
