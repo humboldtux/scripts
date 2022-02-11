@@ -1,0 +1,192 @@
+#!/bin/bash
+
+#repos: contrib non-free
+#Note: a multi-user installation is possible. See https://nixos.org/manual/nix/stable/installation/installing-binary.html#multi-user-installation
+#~/.local/bin
+#pywhat
+# nix: bash-completion direnv
+#fonts-jetbrains-mono fonts-anonymous-pro
+
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+CODENAME=$(lsb_release -sc)
+
+PKGS=(
+	atool
+	anacron
+	apticron
+	backupninja
+	bat
+	build-essential
+	clang
+	clang-tools
+	curl
+	detox
+	diffoscope-minimal
+	dkms
+	duf
+	dos2unix
+	docker-compose
+	docker.io
+	exa
+	fd-find
+	ffmpeg
+	ffmpegthumbnailer
+	firmware-linux
+	firmware-linux-free
+	firmware-linux-nonfree
+	ftp
+	fzf
+	gdebi
+	golang
+	git
+	gita
+	jq
+	ldap-utils
+	libproxychains4
+	libssl-dev
+	libx11-dev
+	linux-headers-amd64
+	lldb
+	locate
+	mariadb-client
+	miller
+	needrestart
+	neofetch
+	neovim
+	newsboat
+	nodejs
+	notcurses-bin
+	npm
+	odt2txt
+	okular
+	openvpn
+	pdftk
+	pipx
+	pkg-config
+	poppler-utils
+	proxychains4
+	putty-tools
+	python3-ldap
+	python3-pil
+	python3-pip
+	python3-venv
+	ranger
+	rdiff-backup
+	ripgrep
+	rsync
+	ruby-dev
+	ruby-notify
+	samba-common
+	shellcheck
+	strace
+	sudo
+	swaks
+	tcpdump
+	tig
+	tre-command
+	tshark
+	unrar
+	vim
+	w3m
+	xorriso
+	yadm
+	yt-dlp
+)
+echo "Installation APT: " "${PKGS[@]}"
+sudo apt-get -y install "${PKGS[@]}" >/dev/null
+
+PIPX_PKGS=(
+	reindent
+)
+echo "Installation logiciels pipx: " "${PIPX_PKGS[@]}"
+for PKG in "${PIPX_PKGS[@]}"; do
+	if [[ ! -d "$HOME/.local/pipx/venvs/$PKG" ]]; then
+		pipx install "$PKG" >/dev/null
+	fi
+done
+PATH=$HOME/.local/bin:$PATH
+
+if [[ ! -d "$HOME/.local/share/fonts/NerdFonts" ]]; then
+	echo "Installing Nerd Fonts"
+	sudo apt-get install -y subversion-tools >/dev/null
+	mkdir -p /tmp/nerd-fonts/patched-fonts
+	cd /tmp/nerd-fonts/patched-fonts || exit
+	svn export https://github.com/ryanoasis/nerd-fonts/trunk/patched-fonts/JetBrainsMono >/dev/null
+	cd /tmp/nerd-fonts/ || exit
+	wget -q https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/install.sh
+	bash install.sh JetBrainsMono >/dev/null
+fi
+
+echo "Installation cargo"
+/usr/bin/curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -q -y
+source "$HOME"/.cargo/env
+echo "Installation pkgs cargo"
+CARGO_PKGS=(
+	bottom
+	broot
+	cargo-edit
+	cargo-update
+	cargo-watch
+	choose
+	du-dust
+	git-delta
+	gitui
+	mdcat
+	navi
+	procs
+	sd
+	shellharden
+	skim
+	starship
+	topgrade
+	viu
+	xh
+	xsv
+	zoxide
+)
+for PKG in "${CARGO_PKGS[@]}"; do
+	echo "  pkg $PKG"
+	cargo -q install "$PKG"
+done
+cargo -q install nu --features=extra
+cargo -q install --locked navi
+if [[ ! -f "$HOME/.config/broot/launcher/bash/br" ]]; then
+	"$HOME"/.cargo/bin/broot --install
+fi
+
+PKGS_GO=(
+	github.com/akavel/up
+	github.com/claudiodangelis/qrcp
+	github.com/jesseduffield/lazygit
+	mvdan.cc/sh/v3/cmd/shfmt
+)
+echo "Installation go get"
+for PKG in "${PKGS_GO[@]}"; do
+	/usr/bin/go install "$PKG"@latest
+done
+
+if [[ ! -d $HOME/dev/src/github.com/humboldtux ]]; then
+	mkdir -p "$HOME"/{bin,dev,pkg} \
+		"$HOME"/dev/src/github.com/humboldtux
+fi
+
+git clone https://github.com/humboldtux/cheats "$HOME"/dev/src/github.com/humboldtux/cheats 2>/dev/null
+git clone https://github.com/humboldtux/scripts "$HOME"/dev/src/github.com/humboldtux/scripts 2>/dev/null
+gita add "$HOME"/dev/src/github.com/humboldtux/{cheats,scripts}*
+
+if ! dpkg-query -W -f='${Status}' sysdig >/dev/null; then
+	echo "Installation sysdig"
+	curl -sSL https://s3.amazonaws.com/download.draios.com/stable/install-sysdig | sudo bash
+fi
+
+if [[ ! -d "$HOME/.local/share/yadm/repo.git" ]]; then
+	echo "Installation Yadm"
+	yadm clone "https://github.com/humboldtux/dotfiles.git"
+	#yadm reset --hard
+fi
+
+if ! dpkg-query -W -f='${Status}' crowdsec >/dev/null; then
+	curl -s https://packagecloud.io/install/repositories/crowdsec/crowdsec/script.deb.sh | sudo bash
+	sudo apt-get install -y crowdsec >/dev/null
+fi
