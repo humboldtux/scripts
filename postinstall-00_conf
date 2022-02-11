@@ -4,20 +4,21 @@ export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
 echo "Config Git"
+sudo apt-get install -y git >/dev/null
 git config --global pull.ff only
 
 echo "Desactivation accès root"
-sudo passwd -l root > /dev/null
+sudo passwd -l root >/dev/null
 
 echo "désactivation maj cache man-db"
-sudo apt-get -y remove --auto-remove man-db > /dev/null
+sudo apt-get -y remove --auto-remove man-db >/dev/null
 sudo systemctl mask man-db.service
 sudo systemctl daemon-reload
 
-echo "Désactivation Evolution"
-sudo chmod -x /usr/lib/evolution/evolution-addressbook-factory
-sudo chmod -x /usr/lib/evolution/evolution-calendar-factory
-sudo chmod -x /usr/lib/evolution/evolution-source-registry
+#echo "Désactivation Evolution"
+#sudo chmod -x /usr/lib/evolution/evolution-addressbook-factory
+#sudo chmod -x /usr/lib/evolution/evolution-calendar-factory
+#sudo chmod -x /usr/lib/evolution/evolution-source-registry
 
 echo "désactivation veille automatique"
 sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
