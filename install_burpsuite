@@ -1,21 +1,21 @@
 #!/bin/bash
 
-if [[ ! -d "/opt/BurpSuiteCommunity" && ! -d "${HOME}/BurpSuiteCommunity" ]]; then
-  echo "Installation BurpSuite"
+if [[ ! -d "/opt/BurpSuiteCommunity" && ! -d "$HOME/BurpSuiteCommunity" ]]; then
+	echo "Installation BurpSuite"
 
-  echo 'sys.adminRights$Boolean=true' > /tmp/response.varfile
-  echo 'sys.fileAssociation.extensions$StringArray="burp"' >> /tmp/response.varfile
-  echo 'sys.fileAssociation.launchers$StringArray="70"' >> /tmp/response.varfile
-  echo 'sys.installationDir=/opt/BurpSuiteCommunity' >> /tmp/response.varfile
-  echo 'sys.languageId=en' >> /tmp/response.varfile
-  echo 'sys.programGroupDisabled$Boolean=false' >> /tmp/response.varfile
-  echo 'sys.symlinkDir=/usr/local/bin' >> /tmp/response.varfile
+	echo 'sys.adminRights$Boolean=true' >/tmp/response.varfile
+	echo 'sys.fileAssociation.extensions$StringArray="burp"' >>/tmp/response.varfile
+	echo 'sys.fileAssociation.launchers$StringArray="70"' >>/tmp/response.varfile
+	echo 'sys.installationDir=/opt/BurpSuiteCommunity' >>/tmp/response.varfile
+	echo 'sys.languageId=en' >>/tmp/response.varfile
+	echo 'sys.programGroupDisabled$Boolean=false' >>/tmp/response.varfile
+	echo 'sys.symlinkDir=/usr/local/bin' >>/tmp/response.varfile
 
-  echo "Téléchargement BurpSuite"
-  wget -q "https://portswigger.net/burp/releases/download?product=community&type=Linux" -O /tmp/burp.sh
+	echo "Téléchargement BurpSuite"
+	wget -q "https://portswigger.net/burp/releases/download?product=community&type=Linux" -O /tmp/burp.sh
 
-  sudo sh /tmp/burp.sh -q -varfile /tmp/response.varfile
+	sudo sh /tmp/burp.sh -q -varfile /tmp/response.varfile
 
-  sudo chown root:root /opt/BurpSuiteCommunity/burpbrowser/*/chrome-sandbox
-  sudo chmod u+s /opt/BurpSuiteCommunity/burpbrowser/*/chrome-sandbox
+	sudo chown root:root /opt/BurpSuiteCommunity/burpbrowser/*/chrome-sandbox
+	sudo chmod u+s /opt/BurpSuiteCommunity/burpbrowser/*/chrome-sandbox
 fi

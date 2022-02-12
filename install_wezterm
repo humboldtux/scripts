@@ -5,8 +5,8 @@ export NEEDRESTART_MODE=a
 
 source ~/.bash_functions
 
-url=`github_get_latest_dwds wez/wezterm | fzf`
-wget -q ${url} -O /tmp/wezterm.deb
+url=$(github_get_latest_dwds wez/wezterm | sk)
+wget -q "$url" -O /tmp/wezterm.deb
 
 echo "Installation Wezterm"
-sudo apt-get install -y /tmp/wezterm.deb > /dev/null
+sudo apt-get install -y /tmp/wezterm.deb >/dev/null

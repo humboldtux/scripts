@@ -3,23 +3,20 @@
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
-if ! dpkg-query -W -f='${Status}' google-chrome-stable > /dev/null
-then
-  echo "Installation Chrome"
-  wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/chrome.deb
-  sudo apt-get install -y /tmp/chrome.deb > /dev/null
+if ! dpkg-query -W -f='${Status}' google-chrome-stable >/dev/null; then
+	echo "Installation Chrome"
+	wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/chrome.deb
+	sudo apt-get install -y /tmp/chrome.deb >/dev/null
 fi
 
-if ! dpkg-query -W -f='${Status}' brave-browser > /dev/null
-then
-  sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-  echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
-  sudo apt-get update > /dev/null
-  sudo apt-get install -y brave-browser > /dev/null
+if ! dpkg-query -W -f='${Status}' brave-browser >/dev/null; then
+	sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+	echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+	sudo apt-get update >/dev/null
+	sudo apt-get install -y brave-browser >/dev/null
 fi
 
-if ! dpkg-query -W -f='${Status}' torbrowser-launcher > /dev/null
-then
-  echo "Installation Tor"
-  sudo apt-get install -y torbrowser-launcher  > /dev/null && torbrowser-launcher > /dev/null
+if ! dpkg-query -W -f='${Status}' torbrowser-launcher >/dev/null; then
+	echo "Installation Tor"
+	sudo apt-get install -y torbrowser-launcher >/dev/null && torbrowser-launcher >/dev/null
 fi

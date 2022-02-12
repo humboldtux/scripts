@@ -2,10 +2,8 @@
 
 #repos: contrib non-free
 #Note: a multi-user installation is possible. See https://nixos.org/manual/nix/stable/installation/installing-binary.html#multi-user-installation
-#~/.local/bin
-#pywhat
-# nix: bash-completion direnv
 #fonts-jetbrains-mono fonts-anonymous-pro
+#deb dpkg: nix-bin
 
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
@@ -97,6 +95,7 @@ echo "Installation APT: " "${PKGS[@]}"
 sudo apt-get -y install "${PKGS[@]}" >/dev/null
 
 PIPX_PKGS=(
+	pywhat
 	reindent
 )
 echo "Installation logiciels pipx: " "${PIPX_PKGS[@]}"
@@ -133,7 +132,6 @@ CARGO_PKGS=(
 	git-delta
 	gitui
 	mdcat
-	navi
 	procs
 	sd
 	shellharden
@@ -155,6 +153,29 @@ if [[ ! -f "$HOME/.config/broot/launcher/bash/br" ]]; then
 	"$HOME"/.cargo/bin/broot --install
 fi
 
+if [[ ! -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]]; then
+	echo "Installation nix"
+	curl -sSL https://nixos.org/nix/install | sh
+	. "$HOME"/.nix-profile/etc/profile.d/nix.sh
+fi
+NIX_PKGS=(
+	bash-completion
+	direnv
+)
+sudo -E sh -c 'echo 1 > /proc/sys/vm/overcommit_memory' # probleme memoire
+for PKG in "${NIX_PKGS[@]}"; do
+	if [[ ! -L "$HOME/.nix-profile/bin/$PKG" ]]; then
+		echo "Installation pkg nix $PKG"
+		"$HOME"/.nix-profile/bin/nix-env --quiet -i "$PKG" >/dev/null
+	fi
+done
+
+if [[ ! -d $HOME/dev/src/github.com/humboldtux ]]; then
+	mkdir -p "$HOME"/{bin,dev,pkg} \
+		"$HOME"/dev/src/github.com/humboldtux
+fi
+export GOPATH=$HOME/dev
+export GOBIN=$HOME/bin
 PKGS_GO=(
 	github.com/akavel/up
 	github.com/claudiodangelis/qrcp
@@ -165,11 +186,6 @@ echo "Installation go get"
 for PKG in "${PKGS_GO[@]}"; do
 	/usr/bin/go install "$PKG"@latest
 done
-
-if [[ ! -d $HOME/dev/src/github.com/humboldtux ]]; then
-	mkdir -p "$HOME"/{bin,dev,pkg} \
-		"$HOME"/dev/src/github.com/humboldtux
-fi
 
 git clone https://github.com/humboldtux/cheats "$HOME"/dev/src/github.com/humboldtux/cheats 2>/dev/null
 git clone https://github.com/humboldtux/scripts "$HOME"/dev/src/github.com/humboldtux/scripts 2>/dev/null
@@ -182,8 +198,8 @@ fi
 
 if [[ ! -d "$HOME/.local/share/yadm/repo.git" ]]; then
 	echo "Installation Yadm"
-	yadm clone "https://github.com/humboldtux/dotfiles.git"
-	#yadm reset --hard
+	yadm clone "https://github.com/humboldtux/dotfiles.git" --no-bootstrap
+	yadm reset --hard
 fi
 
 if ! dpkg-query -W -f='${Status}' crowdsec >/dev/null; then

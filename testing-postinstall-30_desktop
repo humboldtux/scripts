@@ -1,0 +1,48 @@
+#!/bin/bash
+
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
+echo "Disable GDM Wayland"
+sudo sed -i s/#Wayland/Wayland/g /etc/gdm3/daemon.conf
+
+install_browsers
+
+install_burpsuite
+
+PKGS=(
+	calibre
+	copyq
+	flameshot
+	freerdp2-x11
+	icedtea-netx
+	keychain
+	libcanberra-gtk-module
+	libreoffice
+	lightdm-remote-session-freerdp2
+	nautilus-extension-burner
+	nautilus-filename-repairer
+	nautilus-scripts-manager
+	network-manager-pptp-gnome
+	rdesktop
+	ssh-askpass-gnome
+	ttf-xfree86-nonfree
+	wireshark
+	xclip
+	zathura
+)
+echo "Installation APT: " "${PKGS[@]}"
+sudo apt-get -y install "${PKGS[@]}" >/dev/null
+
+echo "Ajout shorcut flameshot"
+gsettings set org.gnome.settings-daemon.plugins.media-keys screenshot '[]'
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flameshot/']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flameshot/ name 'PrtScr flameshot'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flameshot/ command '/usr/bin/flameshot gui'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flameshot/ binding 'Print'
+
+if [[ ! -f "$HOME"/.local/bin/obsidian ]]; then
+	echo "Installation Obsidian"
+	wget 'https://github.com/obsidianmd/obsidian-releases/releases/download/v0.12.15/Obsidian-0.12.15.AppImage' -O "$HOME"/.local/bin/obsidian
+	chmod +x "$HOME"/.local/bin/obsidian
+fi
