@@ -1,0 +1,33 @@
+#!/bin/bash
+
+CARGO_PKGS=(
+	broot
+	cargo-edit
+	cargo-update
+	cargo-watch
+	git-delta
+	gitui
+	mdcat
+	procs
+	sd
+	shellharden
+	viu
+	xh
+	xsv
+)
+
+mkdir -p "$HOME"/dra/bin
+
+dra clementtsang/bottom download -o /tmp/bottom.tgz --select bottom_x86_64-unknown-linux-gnu.tar.gz
+
+dra theryangeary/choose download -o "$HOME"/dra/bin/choose --select choose-x86_64-unknown-linux-musl
+
+dra bootandy/dust download -o /tmp/dust.tgz --select dust-v0.7.5-x86_64-unknown-linux-musl.tar.gz
+
+dra lotabout/skim download -o /tmp/skim.tgz --select skim-v{tag}-x86_64-unknown-linux-musl.tar.gz
+
+dra starship/starship download -o /tmp/starship.tgz --select starship-x86_64-unknown-linux-gnu.tar.gz
+
+dra r-darwish/topgrade download -o /tmp/topgrade.tgz --select topgrade-v{tag}-x86_64-unknown-linux-musl.tar.gz
+
+dra ajeetdsouza/zoxide download -o /tmp/zoxide.tgz --select zoxide-v{tag}-x86_64-unknown-linux-musl.tar.gz
