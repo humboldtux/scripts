@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ ! -d "$HOME"/dev/src/github.com/devmatteini/dra ]; then
+	echo "Installation dra"
+	git clone -q https://github.com/devmatteini/dra "$HOME"/dev/src/github.com/devmatteini/dra
+	cd "$HOME"/dev/src/github.com/devmatteini/dra || exit 1
+	gita add .
+	make -s release 2>/dev/null
+	cp -a ./target/release/dra "$HOME"/.cargo/bin/
+fi
