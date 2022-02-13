@@ -3,6 +3,11 @@
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
+sudo apt-get install -y build-essential git linux-headers-amd64 >/dev/null
+
+echo "PATH dirs"
+mkdir -p "$HOME"/bin "$HOME"/.local/bin
+
 echo "Config Git"
 sudo apt-get install -y git >/dev/null
 git config --global pull.ff only
