@@ -25,6 +25,7 @@ tar --extract -C "$HOME"/dra/bin/ --file /tmp/bottom.tgz btm
 VERSION=$(lastversion https://github.com/Canop/broot | sed s/v//g)
 wget -nv "$WGETOPTS" https://github.com/Canop/broot/releases/latest/download/broot_"$VERSION".zip -O /tmp/broot.zip
 unzip -q -o -p /tmp/broot.zip build/x86_64-linux/broot >"$HOME"/dra/bin/broot
+chmod u+x "$HOME"/dra/bin/broot
 if [[ ! -f "$HOME/.config/broot/launcher/bash/br" ]]; then
 	"$HOME"/dra/bin/broot --install
 fi
