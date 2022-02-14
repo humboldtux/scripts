@@ -122,36 +122,13 @@ echo "Installation cargo"
 source "$HOME"/.cargo/env
 echo "Installation pkgs cargo"
 CARGO_PKGS=(
-	bottom
-	broot
 	cargo-edit
-	cargo-update
-	cargo-watch
-	choose
-	du-dust
-	git-delta
-	gitui
 	mdcat
-	procs
-	sd
-	shellharden
-	skim
-	starship
-	topgrade
-	viu
-	xh
-	xsv
-	zoxide
 )
 for PKG in "${CARGO_PKGS[@]}"; do
 	echo "  pkg $PKG"
 	cargo -q install "$PKG"
 done
-cargo -q install nu --features=extra
-cargo -q install --locked navi
-if [[ ! -f "$HOME/.config/broot/launcher/bash/br" ]]; then
-	"$HOME"/.cargo/bin/broot --install
-fi
 
 if [[ ! -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]]; then
 	echo "Installation nix"
@@ -174,8 +151,8 @@ if [[ ! -d $HOME/dev/src/github.com/humboldtux ]]; then
 	mkdir -p "$HOME"/{bin,dev,pkg} \
 		"$HOME"/dev/src/github.com/humboldtux
 fi
-export GOPATH=$HOME/dev
-export GOBIN=$HOME/bin
+export GOPATH="$HOME"/dev
+export GOBIN="$HOME"/go/bin
 PKGS_GO=(
 	github.com/akavel/up
 	github.com/claudiodangelis/qrcp
@@ -186,6 +163,8 @@ echo "Installation go get"
 for PKG in "${PKGS_GO[@]}"; do
 	/usr/bin/go install "$PKG"@latest
 done
+
+bash "$HOME"/dev/src/github.com/humboldtux/scripts/install_binaries
 
 git clone https://github.com/humboldtux/cheats "$HOME"/dev/src/github.com/humboldtux/cheats 2>/dev/null
 git clone https://github.com/humboldtux/scripts "$HOME"/dev/src/github.com/humboldtux/scripts 2>/dev/null

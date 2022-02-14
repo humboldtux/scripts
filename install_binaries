@@ -1,0 +1,93 @@
+#!/bin/bash
+
+if [[ $1 == '-u' ]]; then
+	WGETOPTS="-N" # only download if version is newer
+else
+	WGETOPTS="--no-clobber" #only download if file does not exist
+fi
+
+lastversion() {
+	basename "$(curl -fs -o/dev/null -w %{redirect_url} "$1"/releases/latest)"
+}
+
+CARGO_PKGS=(
+	cargo-edit
+	mdcat
+)
+
+mkdir -p "$HOME"/dra/bin
+
+echo "Install binaries"
+
+wget -nv "$WGETOPTS" https://github.com/ClementTsang/bottom/releases/latest/download/bottom_x86_64-unknown-linux-musl.tar.gz -O /tmp/bottom.tgz
+tar --extract -C "$HOME"/dra/bin/ --file /tmp/bottom.tgz btm
+
+VERSION=$(lastversion https://github.com/Canop/broot | sed s/v//g)
+wget -nv "$WGETOPTS" https://github.com/Canop/broot/releases/latest/download/broot_"$VERSION".zip -O /tmp/broot.zip
+unzip -q -o -p /tmp/broot.zip build/x86_64-linux/broot >"$HOME"/dra/bin/broot
+if [[ ! -f "$HOME/.config/broot/launcher/bash/br" ]]; then
+	"$HOME"/dra/bin/broot --install
+fi
+
+VERSION=$(lastversion https://github.com/watchexec/cargo-watch)
+wget -nv "$WGETOPTS" https://github.com/watchexec/cargo-watch/releases/latest/download/cargo-watch-"$VERSION"-x86_64-unknown-linux-musl.tar.xz -O /tmp/cargo-watch.tar.xz
+tar --extract --strip-components 1 -C "$HOME"/dra/bin/ --file /tmp/cargo-watch.tar.xz cargo-watch-"$VERSION"-x86_64-unknown-linux-musl/cargo-watch
+
+wget -nv "$WGETOPTS" https://github.com/theryangeary/choose/releases/latest/download/choose-x86_64-unknown-linux-musl -O "$HOME"/dra/bin/choose
+
+VERSION=$(lastversion https://github.com/dandavison/delta)
+wget -nv "$WGETOPTS" https://github.com/dandavison/delta/releases/latest/download/delta-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/delta.tgz
+tar --extract --strip-components 1 -C "$HOME"/dra/bin/ --file /tmp/delta.tgz delta-"$VERSION"-x86_64-unknown-linux-musl/delta
+
+VERSION=$(lastversion https://github.com/bootandy/dust)
+wget -nv "$WGETOPTS" https://github.com/bootandy/dust/releases/latest/download/dust-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/dust.tgz
+tar --extract --strip-components 1 -C "$HOME"/dra/bin/ --file /tmp/dust.tgz dust-"$VERSION"-x86_64-unknown-linux-musl/dust
+
+wget -nv "$WGETOPTS" https://github.com/Extrawurst/gitui/releases/latest/download/gitui-linux-musl.tar.gz -O /tmp/gitui.tgz
+tar --extract -C "$HOME"/dra/bin/ --file /tmp/gitui.tgz ./gitui
+
+VERSION=$(lastversion https://github.com/denisidoro/navi)
+wget -nv "$WGETOPTS" https://github.com/denisidoro/navi/releases/latest/download/navi-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/navi.tgz
+tar --extract -C "$HOME"/dra/bin/ --file /tmp/navi.tgz navi
+
+VERSION1=$(lastversion https://github.com/nushell/nushell)
+VERSION2=$(lastversion https://github.com/nushell/nushell | tr '.' '_')
+wget -nv "$WGETOPTS" https://github.com/nushell/nushell/releases/latest/download/nu_"$VERSION2"_linux.tar.gz -O /tmp/nushell.tgz
+tar --extract --strip-components 2 -C "$HOME"/dra/bin/ --file /tmp/nushell.tgz --wildcards nu_"$VERSION2"_linux/nushell-"$VERSION1"/nu
+
+VERSION=$(lastversion https://github.com/dalance/procs)
+wget -nv "$WGETOPTS" https://github.com/dalance/procs/releases/latest/download/procs-"$VERSION"-x86_64-lnx.zip -O /tmp/procs.zip
+unzip -q -o /tmp/procs.zip -d "$HOME"/dra/bin/
+
+VERSION=$(lastversion https://github.com/chmln/sd)
+wget -nv "$WGETOPTS" https://github.com/chmln/sd/releases/latest/download/sd-"$VERSION"-x86_64-unknown-linux-musl -O "$HOME"/dra/bin/sd
+
+VERSION=$(lastversion https://github.com/anordal/shellharden | sed -e s/v//g)
+wget -nv "$WGETOPTS" https://github.com/anordal/shellharden/releases/latest/download/shellharden-"$VERSION"-x86_64-linux-gnu -O "$HOME"/dra/bin/shellharden
+
+VERSION=$(lastversion https://github.com/lotabout/skim)
+wget -nv "$WGETOPTS" https://github.com/lotabout/skim/releases/latest/download/skim-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/skim.tgz
+tar --extract -C "$HOME"/dra/bin/ --file /tmp/skim.tgz sk
+
+wget -nv "$WGETOPTS" https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-gnu.tar.gz -O /tmp/starship.tgz
+tar --extract -C "$HOME"/dra/bin/ --file /tmp/starship.tgz starship
+
+VERSION=$(lastversion https://github.com/r-darwish/topgrade)
+wget -nv "$WGETOPTS" https://github.com/r-darwish/topgrade/releases/latest/download/topgrade-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/topgrade.tgz
+tar --extract -C "$HOME"/dra/bin/ --file /tmp/topgrade.tgz topgrade
+
+wget -nv "$WGETOPTS" https://github.com/atanunq/viu/releases/latest/download/viu -O "$HOME"/dra/bin/viu
+
+VERSION=$(lastversion https://github.com/ducaale/xh)
+wget -nv "$WGETOPTS" https://github.com/ducaale/xh/releases/latest/download/xh-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/xh.tgz
+tar --extract --strip-components 1 -C "$HOME"/dra/bin/ --file /tmp/xh.tgz xh-"$VERSION"-x86_64-unknown-linux-musl/xh
+
+VERSION=$(lastversion https://github.com/BurntSushi/xsv)
+wget -nv "$WGETOPTS" https://github.com/BurntSushi/xsv/releases/latest/download/xsv-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/xsv.tgz
+tar --extract -C "$HOME"/dra/bin/ --file /tmp/xsv.tgz xsv
+
+VERSION=$(lastversion https://github.com/ajeetdsouza/zoxide)
+wget -nv "$WGETOPTS" https://github.com/ajeetdsouza/zoxide/releases/latest/download/zoxide-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/zoxide.tgz
+tar --extract -C "$HOME"/dra/bin/ --file /tmp/zoxide.tgz zoxide
+
+chmod u+x "$HOME"/dra/bin/*
