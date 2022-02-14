@@ -11,8 +11,8 @@ else
 	#PACKER_CMD='PackerInstall'
 fi
 
-"$WGET" https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O "$HOME"/.local/bin/nvim
-chmod +x "$HOME"/.local/bin/nvim
+#"$WGET" https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O "$HOME"/.local/bin/nvim
+#chmod +x "$HOME"/.local/bin/nvim
 
 #if [[ ! -d "$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim" ]]; then
 #	echo "Installation plugin packer"
@@ -47,8 +47,8 @@ sudo apt-get install -y exuberant-ctags 2>/dev/null
 #echo "install bash LSP"
 #npm i -g bash-language-server
 
-echo "Install TOML LSP"
-cargo -q install taplo-lsp
+echo "Install TOML CLi"
+#cargo -q install taplo-lsp
 cargo -q install taplo-cli
 
 echo "Install formatters"
