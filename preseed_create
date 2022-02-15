@@ -11,139 +11,131 @@
 # u - error if undefined variable
 # o pipefail - script fails if command piped fails
 # x - output each line (debug)
-set -euo pipefail
+#set -euo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
-sudo apt-get install -y isolinux > /dev/null
+sudo apt-get install -y isolinux >/dev/null
 
-PRESEED_DIR="${HOME}/dev/src/github.com/humboldtux/scripts/preseed"
+PRESEED_DIR="$HOME/dev/src/github.com/humboldtux/scripts/preseed"
 
-INPUT=${1:-`ls ~/Téléchargements/firmware-*-amd64-netinst.iso`}
+INPUT=${1:-$(ls ~/Téléchargements/firmware-*-amd64-netinst.iso)}
 PRESEED=${2:-${PRESEED_DIR}/preseed.cfg}
 ISOLINUX=${3:-${PRESEED_DIR}/isolinux.cfg}
 GRUB=${4:-${PRESEED_DIR}/grub.cfg}
 
-if [[ ! -f ${INPUT} ]]; then
-  echo "Fichier ISO ${INPUT} introuvable"
-  exit
+if [[ ! -f $INPUT ]]; then
+	echo "Fichier ISO $INPUT introuvable"
+	exit
 fi
 
-if [[ ! -f ${PRESEED} ]]; then
-  echo "Fichier preseed ${PRESEED} introuvable"
-  exit
+if [[ ! -f $PRESEED ]]; then
+	echo "Fichier preseed $PRESEED introuvable"
+	exit
 fi
 
-if [[ ! -f ${ISOLINUX} ]]; then
-  echo "Fichier isolinux ${ISOLINUX} introuvable"
-  exit
+if [[ ! -f $ISOLINUX ]]; then
+	echo "Fichier isolinux $ISOLINUX introuvable"
+	exit
 fi
 
-if [[ ! -f ${GRUB} ]]; then
-  echo "Fichier grub ${GRUB} introuvable"
-  exit
+if [[ ! -f $GRUB ]]; then
+	echo "Fichier grub $GRUB introuvable"
+	exit
 fi
 
 LOOPDIR="/mnt/loopdir"
 OUTPUT="/tmp/debian-nonfree-preseed.iso"
 WORKDIR="/tmp/preseed"
 
-sudo -l > /dev/null
+sudo -l >/dev/null
 echo -ne 'Mounting ${INPUT} in ${MOUNT}               [===========>                  ](40%)\r'
-sudo mkdir ${LOOPDIR} -p
-sudo mount -o loop ${INPUT} ${LOOPDIR}
+sudo mkdir "$LOOPDIR" -p
+sudo mount -o loop "$INPUT" "$LOOPDIR"
 if [ $? -ne 0 ]; then
-  echo "Error while mounting the ISO ${INPUT} in ${LOOPDIR}. Aborting"
-  exit 2
+	echo "Error while mounting the ISO $INPUT in $LOOPDIR. Aborting"
+	exit 2
 fi
 
-mkdir -p ${WORKDIR}/cd
+mkdir -p "$WORKDIR"/cd
 echo -ne 'Extracting ISO image                        [==============>               ](50%)\r'
-rsync -a -H --exclude=TRANS.TBL ${LOOPDIR}/ ${WORKDIR}/cd
-sudo chmod -R u+rw ${WORKDIR}/cd
+rsync -a -H --exclude=TRANS.TBL "$LOOPDIR"/ "$WORKDIR"/cd
+sudo chmod -R u+rw "$WORKDIR"/cd
 
 echo -ne 'Umounting ${INPUT}${MOUNT}                  [=================>            ](60%)\r'
-sudo umount ${LOOPDIR}
+sudo umount "$LOOPDIR"
 
 echo -ne 'Hacking initrd                              [====================>         ](70%)\r'
-mkdir -p ${WORKDIR}/irmod
-cd ${WORKDIR}/irmod
-gzip -d < ${WORKDIR}/cd/install.amd/initrd.gz | cpio --extract --make-directories --no-absolute-filenames 2>/dev/null
-sleep 5
-if [ $? -ne 0 ]
-then
-  echo "Error while getting ${WORKDIR}/cd/install.amd/initrd.gz content. Aborting"
-  exit 1
+mkdir -p "$WORKDIR"/irmod
+cd "$WORKDIR"/irmod
+gzip -d <"$WORKDIR"/cd/install.amd/initrd.gz | sudo cpio --extract --make-directories --no-absolute-filenames 2>/dev/null
+if [ $? -ne 0 ]; then
+	echo "Error while getting $WORKDIR/cd/install.amd/initrd.gz content. Aborting"
+	exit 1
 fi
 
-cp $PRESEED ${WORKDIR}/irmod/preseed.cfg
-find . | cpio -H newc --create 2>/dev/null | gzip -9 > ${WORKDIR}/cd/install.amd/initrd.gz 2>/dev/null
-if [ $? -ne 0 ]
-then
-  echo "Error while putting new content into ${WORKDIR}/cd/install.amd/initrd.gz. Aborting"
-  exit 1
+sudo cp "$PRESEED" "$WORKDIR"/irmod/preseed.cfg
+find . | cpio -H newc --create 2>/dev/null | gzip -9 >"$WORKDIR"/cd/install.amd/initrd.gz 2>/dev/null
+if [ $? -ne 0 ]; then
+	echo "Error while putting new content into $WORKDIR/cd/install.amd/initrd.gz. Aborting"
+	exit 1
 fi
 
-cd ${WORKDIR}
-rm -rf ${WORKDIR}/irmod
+cd "$WORKDIR" || exit 1
+sudo rm -rf "$WORKDIR"/irmod
 
 echo -ne 'Custom isolinux menu                       [=======================>      ](75%)\r'
-sed -i 's/include gtk.cfg//g' ${WORKDIR}/cd/isolinux/menu.cfg 2>/dev/null
-mv ${WORKDIR}/cd/isolinux/menu.cfg ${WORKDIR}/cd/isolinux/original.cfg
-if [ $? -ne 0 ]
-then
-  echo "Error while renaming ${WORKDIR}/cd/isolinux/menu.cfg Aborting"
-  exit 1
+sed -i 's/include gtk.cfg//g' "$WORKDIR"/cd/isolinux/menu.cfg 2>/dev/null
+mv "$WORKDIR"/cd/isolinux/menu.cfg "$WORKDIR"/cd/isolinux/original.cfg
+if [ $? -ne 0 ]; then
+	echo "Error while renaming $WORKDIR/cd/isolinux/menu.cfg Aborting"
+	exit 1
 fi
 
-cp ${ISOLINUX} ${WORKDIR}/cd/isolinux/menu.cfg
-if [ $? -ne 0 ]
-then
-  echo "Error while copying menu installer ${ISOLINUX} to ${WORKDIR}/cd/isolinux/menu.cfg Aborting"
-  exit 1
+cp "$ISOLINUX" "$WORKDIR"/cd/isolinux/menu.cfg
+if [ $? -ne 0 ]; then
+	echo "Error while copying menu installer $ISOLINUX to $WORKDIR/cd/isolinux/menu.cfg Aborting"
+	exit 1
 fi
 
 echo -ne 'Custom grub menu                           [=======================>      ](80%)\r'
-cp ${GRUB} ${WORKDIR}/cd/boot/grub/grub.cfg
-if [ $? -ne 0 ]
-then
-  echo "Error while copying menu installer ${GRUB} to ${WORKDIR}/cd/boot/grub/grub.cfg Aborting"
-  exit 1
+cp "$GRUB" "$WORKDIR"/cd/boot/grub/grub.cfg
+if [ $? -ne 0 ]; then
+	echo "Error while copying menu installer $GRUB to $WORKDIR/cd/boot/grub/grub.cfg Aborting"
+	exit 1
 fi
 
 echo -ne 'Fixing md5sums                              [========================>     ](85%)\r'
-cd ${WORKDIR}/cd
-md5sum `find -follow -type f 2>/dev/null` > md5sum.txt 2>/dev/null
-if [ $? -ne 0 ]
-then
-  echo "Error while fixing md5sums. Aborting"
-  exit 1
+cd "$WORKDIR"/cd || exit 1
+find -follow -type f 2>/dev/null | xargs md5sum >md5sum.txt
+if [ $? -ne 0 ]; then
+	echo 'Error while fixing md5sums. Aborting'
+	exit 1
 fi
 
-cd ${WORKDIR}
+cd "$WORKDIR" || exit 1
 echo -ne 'Creating preseeded ISO image                [==========================>   ](90%)\r'
 #genisoimage -quiet -o ${OUTPUT} -r -J -no-emul-boot -boot-load-size 4 -boot-info-table -b isolinux/isolinux.bin -c isolinux/boot.cat ${WORKDIR}/cd > /dev/null 2>&1
 xorriso -as mkisofs \
-  -quiet \
-  -o $OUTPUT \
-  -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
-  -c isolinux/boot.cat \
-  -b isolinux/isolinux.bin \
-  -no-emul-boot -boot-load-size 4 -boot-info-table \
-  -eltorito-alt-boot \
-  -e boot/grub/efi.img \
-  -no-emul-boot \
-  -isohybrid-gpt-basdat \
-  ${WORKDIR}/cd /dev/null 2>&1
+	-quiet \
+	-o "$OUTPUT" \
+	-isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
+	-c isolinux/boot.cat \
+	-b isolinux/isolinux.bin \
+	-no-emul-boot -boot-load-size 4 -boot-info-table \
+	-eltorito-alt-boot \
+	-e boot/grub/efi.img \
+	-no-emul-boot \
+	-isohybrid-gpt-basdat \
+	"$WORKDIR"/cd /dev/null 2>&1
 
-if [ $? -ne 0 ]
-then
-  echo "Error while creating the preseeded ISO image. Aborting"
-  exit 1
+if [ $? -ne 0 ]; then
+	echo "Error while creating the preseeded ISO image. Aborting"
+	exit 1
 fi
 
 echo -ne 'Preseeded ISO image created                 [==============================](100%)\r'
-echo -e "\ndeleting ${WORKDIR}/cd"
-rm -rf "${WORKDIR}/cd"
+echo -e "\ndeleting $WORKDIR/cd"
+rm -rf "$WORKDIR/cd"
 echo -e "\n\nYour preseeded ISO image is located at $OUTPUT"
