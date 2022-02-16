@@ -1,0 +1,6 @@
+#!/bin/bash
+
+sudo tee /tmp/00sophos <<Content
+Dpkg::Pre-Install-Pkgs {"if [ -x /opt/sophos-av/uninstall.sh ]; then echo pre-hook; systemctl stop sav-protect.service; systemctl stop sav-rms.service;fi";};
+Dpkg::Post-Invoke {"if [ -x /opt/sophos-av/uninstall.sh ]; then echo post-hook; systemctl start sav-protect.service; systemctl start sav-rms.service;fi";};
+Content
