@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [[ -d /opt/VirtualBox ]] && [[ $1 != '-u' ]]; then
+	VERSION=$(virtualbox --help | head -n 1 | awk '{print $NF} ' | sed s/v//g)
+	echo "VirtualBox $VERSION already installed, exiting"
+	exit
+fi
+
+echo "Installing Deps"
+sudo apt-get install -y dkms build-essential linux-headers-amd64 linux-kbuild-* >/dev/null
+
+VERSION=$(curl -s https://download.virtualbox.org/virtualbox/LATEST-STABLE.TXT)
+URL="https://download.virtualbox.org/virtualbox/$VERSION"
+INSTALLER=$(curl -s "$URL"/MD5SUMS | grep run | awk '{print $2}' | sed -e s/*//g)
+
+echo "Downloading /tmp/$INSTALLER"
+wget -q --no-clobber "$URL"/"$INSTALLER" -O /tmp/"$INSTALLER"
+
+echo "Installing /tmp/$INSTALLER"
+sudo sh /tmp/"$INSTALLER" install
+
+sudo rcvboxdrv setup
+
+sudo usermod -aG vboxusers "$USER"
+
+"$HOME"/dev/src/github.com/humboldtux/scripts/vbextpack
+
+sudo wget -q https://raw.githubusercontent.com/gryf/vboxmanage-bash-completion/master/VBoxManage -O /etc/bash_completion.d/VBoxManage
