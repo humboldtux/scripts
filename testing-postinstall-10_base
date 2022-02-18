@@ -24,6 +24,7 @@ PKGS=(
 	dkms
 	duf
 	dos2unix
+	docker-clean
 	docker-compose
 	docker.io
 	exa
@@ -57,7 +58,6 @@ PKGS=(
 	notcurses-bin
 	npm
 	odt2txt
-	okular
 	openvpn
 	pdftk
 	pipx
