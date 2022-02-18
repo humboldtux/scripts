@@ -24,6 +24,7 @@ PKGS=(
 	nautilus-filename-repairer
 	nautilus-scripts-manager
 	network-manager-pptp-gnome
+	okular
 	rdesktop
 	ssh-askpass-gnome
 	ttf-xfree86-nonfree
