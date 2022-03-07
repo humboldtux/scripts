@@ -3,20 +3,18 @@
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
-if [[ ! -f /etc/apt/sources.list.d/dropbox.list ]];then
-  CODENAME=`lsb_release -sc`
-  echo "deb [arch=amd64] http://linux.dropbox.com/debian ${CODENAME} main" | sudo tee -a /etc/apt/sources.list.d/dropbox.list
+if [[ ! -f /etc/apt/sources.list.d/dropbox.list ]]; then
+	echo "deb [arch=amd64] http://linux.dropbox.com/debian sid main" | sudo tee -a /etc/apt/sources.list.d/dropbox.list
 fi
 
-if ! dpkg-query -W -f='${Status}' dropbox > /dev/null
-then
-  echo "Installation Dropbox"
-  gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys FC918B335044912E
-  gpg --export --armor FC918B335044912E | sudo apt-key add
-  sudo apt-get update && sudo apt-get install -y dropbox > /dev/null
-  echo "Récupérez un backup du dossier ${HOME}/Dropbox, puis appuyez sur une touche"
-  dropbox start -i
-  dropbox autostart y
-  dropbox status
-  dropbox filestatus
+if ! dpkg-query -W -f='${Status}' dropbox >/dev/null; then
+	echo "Installation Dropbox"
+	gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys FC918B335044912E
+	gpg --export --armor FC918B335044912E | sudo apt-key add
+	sudo apt-get update && sudo apt-get install -y dropbox >/dev/null
+	echo "Récupérez un backup du dossier $HOME/Dropbox, puis appuyez sur une touche"
+	dropbox start -i
+	dropbox autostart y
+	dropbox status
+	dropbox filestatus
 fi
