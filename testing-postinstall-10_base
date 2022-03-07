@@ -123,6 +123,7 @@ source "$HOME"/.cargo/env
 echo "Installation pkgs cargo"
 CARGO_PKGS=(
 	cargo-edit
+	cargo-update
 	mdcat
 )
 for PKG in "${CARGO_PKGS[@]}"; do
