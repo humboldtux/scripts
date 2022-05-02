@@ -57,6 +57,7 @@ PKGS=(
 	nodejs
 	notcurses-bin
 	npm
+	ntpdate
 	odt2txt
 	openvpn
 	pdftk
@@ -185,4 +186,7 @@ fi
 if ! dpkg-query -W -f='${Status}' crowdsec >/dev/null; then
 	curl -s https://packagecloud.io/install/repositories/crowdsec/crowdsec/script.deb.sh | sudo bash
 	sudo apt-get install -y crowdsec >/dev/null
+	sudo sed -i 's/8080/8181/g' /etc/crowdsec/{config,local_api_credentials}.yaml
+	sudo systemctl restart crowdsec >/dev/null
+	sudo apt-get install -y crowdsec-firewall-bouncer-iptables >/dev/null
 fi
