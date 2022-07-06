@@ -24,7 +24,7 @@ tar --extract -C "$HOME"/dra/bin/ --file /tmp/bottom.tgz btm
 
 VERSION=$(lastversion https://github.com/Canop/broot | sed s/v//g)
 wget -nv "$WGETOPTS" https://github.com/Canop/broot/releases/latest/download/broot_"$VERSION".zip -O /tmp/broot.zip
-unzip -q -o -p /tmp/broot.zip build/x86_64-linux/broot >"$HOME"/dra/bin/broot
+unzip -q -o -p /tmp/broot.zip x86_64-unknown-linux-musl/broot >"$HOME"/dra/bin/broot
 chmod u+x "$HOME"/dra/bin/broot
 if [[ ! -f "$HOME/.config/broot/launcher/bash/br" ]]; then
 	"$HOME"/dra/bin/broot --install
@@ -51,20 +51,16 @@ VERSION=$(lastversion https://github.com/denisidoro/navi)
 wget -nv "$WGETOPTS" https://github.com/denisidoro/navi/releases/latest/download/navi-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/navi.tgz
 tar --extract -C "$HOME"/dra/bin/ --file /tmp/navi.tgz navi
 
-VERSION1=$(lastversion https://github.com/nushell/nushell)
-VERSION2=$(lastversion https://github.com/nushell/nushell | tr '.' '_')
-wget -nv "$WGETOPTS" https://github.com/nushell/nushell/releases/latest/download/nu_"$VERSION2"_linux.tar.gz -O /tmp/nushell.tgz
-tar --extract --strip-components 2 -C "$HOME"/dra/bin/ --file /tmp/nushell.tgz --wildcards nu_"$VERSION2"_linux/nushell-"$VERSION1"/nu
+VERSION=$(lastversion https://github.com/nushell/nushell)
+wget -nv "$WGETOPTS" https://github.com/nushell/nushell/releases/latest/download/nu-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/nushell.tgz
+tar --extract -C "$HOME"/dra/bin/ --file /tmp/nushell.tgz nu
 
 VERSION=$(lastversion https://github.com/dalance/procs)
-wget -nv "$WGETOPTS" https://github.com/dalance/procs/releases/latest/download/procs-"$VERSION"-x86_64-lnx.zip -O /tmp/procs.zip
+wget -nv "$WGETOPTS" https://github.com/dalance/procs/releases/latest/download/procs-"$VERSION"-x86_64-linux.zip -O /tmp/procs.zip
 unzip -q -o /tmp/procs.zip -d "$HOME"/dra/bin/
 
 VERSION=$(lastversion https://github.com/chmln/sd)
 wget -nv "$WGETOPTS" https://github.com/chmln/sd/releases/latest/download/sd-"$VERSION"-x86_64-unknown-linux-musl -O "$HOME"/dra/bin/sd
-
-VERSION=$(lastversion https://github.com/anordal/shellharden | sed -e s/v//g)
-wget -nv "$WGETOPTS" https://github.com/anordal/shellharden/releases/latest/download/shellharden-"$VERSION"-x86_64-linux-gnu -O "$HOME"/dra/bin/shellharden
 
 VERSION=$(lastversion https://github.com/lotabout/skim)
 wget -nv "$WGETOPTS" https://github.com/lotabout/skim/releases/latest/download/skim-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/skim.tgz
@@ -87,7 +83,7 @@ VERSION=$(lastversion https://github.com/BurntSushi/xsv)
 wget -nv "$WGETOPTS" https://github.com/BurntSushi/xsv/releases/latest/download/xsv-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/xsv.tgz
 tar --extract -C "$HOME"/dra/bin/ --file /tmp/xsv.tgz xsv
 
-VERSION=$(lastversion https://github.com/ajeetdsouza/zoxide)
+VERSION=$(lastversion https://github.com/ajeetdsouza/zoxide | sed -e s/v//g)
 wget -nv "$WGETOPTS" https://github.com/ajeetdsouza/zoxide/releases/latest/download/zoxide-"$VERSION"-x86_64-unknown-linux-musl.tar.gz -O /tmp/zoxide.tgz
 tar --extract -C "$HOME"/dra/bin/ --file /tmp/zoxide.tgz zoxide
 

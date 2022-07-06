@@ -78,6 +78,7 @@ PKGS=(
 	ruby-notify
 	samba-common
 	shellcheck
+	shellharden
 	strace
 	sudo
 	swaks
