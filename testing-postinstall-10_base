@@ -99,6 +99,7 @@ sudo apt-get -y install "${PKGS[@]}" >/dev/null
 PIPX_PKGS=(
 	pywhat
 	reindent
+	streamlink
 )
 echo "Installation logiciels pipx: " "${PIPX_PKGS[@]}"
 for PKG in "${PIPX_PKGS[@]}"; do
