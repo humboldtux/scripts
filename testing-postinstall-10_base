@@ -55,7 +55,6 @@ PKGS=(
 	neovim
 	newsboat
 	nodejs
-	notcurses-bin
 	npm
 	ntpdate
 	odt2txt
@@ -78,7 +77,6 @@ PKGS=(
 	ruby-notify
 	samba-common
 	shellcheck
-	shellharden
 	strace
 	sudo
 	swaks
