@@ -3,14 +3,11 @@
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
-sudo apt-get install -y build-essential git linux-headers-amd64 >/dev/null
+sudo apt-get install -y build-essential curl git jq linux-headers-amd64 >/dev/null
+git config --global pull.ff only
 
 echo "PATH dirs"
 mkdir -p "$HOME"/bin "$HOME"/.local/bin
-
-echo "Config Git"
-sudo apt-get install -y git >/dev/null
-git config --global pull.ff only
 
 echo "Desactivation accès root"
 sudo passwd -l root >/dev/null
@@ -20,20 +17,11 @@ sudo apt-get -y remove --auto-remove man-db >/dev/null
 sudo systemctl mask man-db.service
 sudo systemctl daemon-reload
 
-#echo "Désactivation Evolution"
-#sudo chmod -x /usr/lib/evolution/evolution-addressbook-factory
-#sudo chmod -x /usr/lib/evolution/evolution-calendar-factory
-#sudo chmod -x /usr/lib/evolution/evolution-source-registry
-
 echo "désactivation veille automatique"
 sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
-#echo "Installation Parefeu"
-#if ! dpkg-query -W -f='${Status}' firewalld > /dev/null
-#then
-#  sudo apt-get update > /dev/null
-#  sudo apt-get install -y firewalld > /dev/null
-#  sudo firewall-cmd -q --set-default-zone=drop
-#  sudo firewall-cmd -q --runtime-to-permanent
-#  sudo firewall-cmd -q --reload
-#fi
+echo "Installation nushell"
+NUVER=$(curl --silent "https://api.github.com/repos/nushell/nushell/releases/latest" | jq -r '.tag_name')
+echo $NUVER
+wget https://github.com/nushell/nushell/releases/download/$NUVER/nu-$NUVER-x86_64-unknown-linux-gnu.tar.gz -O /tmp/nu.tgz
+sudo tar xzf /tmp/nu.tgz -C /usr/local/bin/ nu
