@@ -10,25 +10,25 @@ GLMF_REPO="${HOME}/dev/src/github.com/GLMF/outils_auteurs"
 
 function diamond_install() {
   #On install pandoc via nix-env, pourpandoc > 2.10
-  nix-env -i pandoc
+  sudo apt install pandoc
   if [[ ! -d ${GLMF_REPO} ]]; then
-    git clone https://github.com/GLMF/outils_auteurs.git ${GLMF_REPO}
+    git clone https://github.com/GLMF/outils_auteurs.git "$GLMF_REPO"
   fi
 }
 
 diamond_new() {
   [[ -z ${NAME} ]] && { echo 'Donnez un nom en paramètre'; exit 1;}
-  mkdir ${ARTICLE_DIR} || exit 1
-  cd ${ARTICLE_DIR} || exit 1
+  mkdir "$ARTICLE_DIR" || exit 1
+  cd "$ARTICLE_DIR" || exit 1
 
-  cp -n ${GLMF_REPO}/Markdown/md-auteur/pandoc-md-auteur/modeles/modele.md ${ARTICLE_DIR}/${NAME}.md
+  cp -n "$GLMF_REPO"/Markdown/md-auteur/pandoc-md-auteur/modeles/modele.md "$ARTICLE_DIR/$NAME".md
   echo "build/*" > .gitignore
   echo "cache/*" >> .gitignore
   git init
   git add .
   git commit -m'Initial commit'
 
-  MODELE=`find ${GLMF_REPO}/Markdown/md-auteur/pandoc-md-auteur/modeles/ -type f -name "modele*template" -execdir basename {} .template ';' | fzf`
+  MODELE=`find "$GLMF_REPO"/Markdown/md-auteur/pandoc-md-auteur/modeles/ -type f -name "modele*template" -execdir basename {} .template ';' | fzf`
   echo "export DIAMOND_MODELE=${MODELE}" > .envrc
   direnv allow
   git add .envrc
@@ -36,7 +36,7 @@ diamond_new() {
 
   printf "\n\n\nCréez le dépôt humboldtux-articles/${NAME} sur Github" 
   read
-  git remote add origin git@github.com:humboldtux-articles/${NAME}.git
+  git remote add origin git@github.com:humboldtux-articles/"$NAME".git
   git branch -M main
   git push -u origin main
 }
@@ -44,25 +44,25 @@ diamond_new() {
 diamond_pandoc() {
   [[ -z ${NAME} ]] && { echo 'Donnez un nom en paramètre'; exit 1;}
   MODE=${1}
-  cd ${ARTICLE_DIR} || exit 1
+  cd "$ARTICLE_DIR" || exit 1
   eval "$(direnv export bash)"
   rm -rf build cache ; mkdir -p build cache
-  unzip  ${GLMF_REPO}/Markdown/md-auteur/pandoc-md-auteur/modeles/${DIAMOND_MODELE}.odt -d ${ARTICLE_DIR}/build/${DIAMOND_MODELE}.odt || exit 1
-  cd ${ARTICLE_DIR} || exit 1
-  pandoc --verbose ${NAME}.md -M prefix=${NAME} -M images=${MODE} -M class=${DIAMOND_MODELE} \
-    --template=${GLMF_REPO}/Markdown/md-auteur/pandoc-md-auteur/modeles/${DIAMOND_MODELE}.template \
-    -t ${GLMF_REPO}/Markdown/md-auteur/pandoc-md-auteur/scripts/writer-article-gnulinuxmagazine.lua \
-    -o build/${DIAMOND_MODELE}.odt/content.xml
+  unzip  "$GLMF_REPO/Markdown/md-auteur/pandoc-md-auteur/modeles/$DIAMOND_MODELE".odt -d "$ARTICLE_DIR/build/$DIAMOND_MODELE".odt || exit 1
+  cd "$ARTICLE_DIR" || exit 1
+  pandoc --verbose "$NAME".md -M prefix="$NAME" -M images="$MODE" -M class="$DIAMOND_MODELE" \
+    --template="$GLMF_REPO/Markdown/md-auteur/pandoc-md-auteur/modeles/$DIAMOND_MODELE".template \
+    -t "$GLMF_REPO"/Markdown/md-auteur/pandoc-md-auteur/scripts/writer-article-gnulinuxmagazine.lua \
+    -o build/"$DIAMOND_MODELE".odt/content.xml
 
-  cd build/${DIAMOND_MODELE}.odt || exit 1
+  cd build/"$DIAMOND_MODELE".odt || exit 1
   zip -r "${NAME}.odt" *
-  xdg-open ${ARTICLE_DIR}/build/${DIAMOND_MODELE}.odt/${NAME}.odt
+  xdg-open "$ARTICLE_DIR/build/$DIAMOND_MODELE.odt/$NAME".odt
 }
 
 diamond_verify() {
   diamond_pandoc ON
-  cd ${ARTICLE_DIR}/build || exit 1
-  mv *.png ${ARTICLE_DIR}/build/${DIAMOND_MODELE}.odt
+  cd "$ARTICLE_DIR"/build || exit 1
+  mv *.png "$ARTICLE_DIR/build/$DIAMOND_MODELE".odt
 }
 
 diamond_create() {
@@ -91,4 +91,4 @@ case ${CMD} in
     ;;
   * )                 usage
     exit 1
-esac
+;; esac
