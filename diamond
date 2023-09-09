@@ -18,15 +18,12 @@ function diamond_install() {
 
 diamond_new() {
   [[ -z ${NAME} ]] && { echo 'Donnez un nom en paramètre'; exit 1;}
-  mkdir "$ARTICLE_DIR" || exit 1
+  git clone git@github.com:humboldtux-articles/Template.git "$ARTICLE_DIR" || exit 1
   cd "$ARTICLE_DIR" || exit 1
 
   cp -n "$GLMF_REPO"/Markdown/md-auteur/pandoc-md-auteur/modeles/modele.md "$ARTICLE_DIR/$NAME".md
-  echo "build/*" > .gitignore
-  echo "cache/*" >> .gitignore
-  git init
   git add .
-  git commit -m'Initial commit'
+  git commit -m'Ajout template article'
 
   MODELE=`find "$GLMF_REPO"/Markdown/md-auteur/pandoc-md-auteur/modeles/ -type f -name "modele*template" -execdir basename {} .template ';' | fzf`
   echo "export DIAMOND_MODELE=${MODELE}" > .envrc
@@ -36,9 +33,8 @@ diamond_new() {
 
   printf "\n\n\nCréez le dépôt humboldtux-articles/${NAME} sur Github" 
   read
-  git remote add origin git@github.com:humboldtux-articles/"$NAME".git
-  git branch -M main
-  git push -u origin main
+  git remote set-url origin git@github.com:humboldtux-articles/"$NAME".git
+  git push
 }
 
 diamond_pandoc() {
