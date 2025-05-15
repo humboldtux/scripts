@@ -3,9 +3,10 @@
 Backup script to create a pre-upgrade backup of important files:
 - .bash_history for current user and root
 - .ssh directory for current user and root
+- ~/.bashrc.d directory for current user and root (if exists)
 - /etc/restic directory
 
-The backup is saved as ~/Documents/backup-pre_upgrade-XXXX.tgz where XXXX is a timestamp.
+The backup is saved as ~/Documents/backup-pre_upgrade-HOSTNAME-XXXX.tgz where HOSTNAME is the machine hostname and XXXX is a timestamp.
 After backup, executes and displays output of:
 - yadm status
 - gita ll
@@ -101,6 +102,43 @@ def create_backup():
                     print(f"❌ Failed to backup {bash_history_path}: {e}")
         else:
             print(f"⚠️ {bash_history_path} does not exist, skipping")
+            
+        # Backup .bashrc.d directory for current user if it exists
+        bashrc_d_path = f"{home_dir}/.bashrc.d"
+        if os.path.exists(bashrc_d_path) and os.path.isdir(bashrc_d_path):
+            try:
+                # Create target directory
+                os.makedirs(f"{temp_dir}/user/{current_user}/.bashrc.d", exist_ok=True)
+                
+                # Copy all files from .bashrc.d
+                files_backed_up = 0
+                for item in os.listdir(bashrc_d_path):
+                    item_path = os.path.join(bashrc_d_path, item)
+                    if os.path.isfile(item_path):
+                        try:
+                            shutil.copy2(item_path, f"{temp_dir}/user/{current_user}/.bashrc.d/{item}")
+                            files_backed_up += 1
+                            print(f"  ✅ Backed up .bashrc.d file: {item}")
+                        except PermissionError:
+                            # Try with sudo if we don't have permission
+                            try:
+                                subprocess.run(
+                                    ["sudo", "cp", item_path, f"{temp_dir}/user/{current_user}/.bashrc.d/{item}"],
+                                    check=True
+                                )
+                                files_backed_up += 1
+                                print(f"  ✅ Backed up .bashrc.d file: {item} (with sudo)")
+                            except subprocess.CalledProcessError as e:
+                                print(f"  ❌ Failed to backup .bashrc.d file {item}: {e}")
+                
+                if files_backed_up > 0:
+                    print(f"✅ Backed up {files_backed_up} files from {bashrc_d_path}")
+                else:
+                    print(f"⚠️ No files found in {bashrc_d_path}, directory is empty")
+            except (PermissionError, OSError) as e:
+                print(f"❌ Failed to backup {bashrc_d_path}: {e}")
+        else:
+            print(f"⚠️ {bashrc_d_path} does not exist or is not a directory, skipping")
 
         # Backup selected .ssh files for current user (id*, *local, *.local, local)
         ssh_dir_path = f"{home_dir}/.ssh"
@@ -215,6 +253,59 @@ def create_backup():
                 print("⚠️ /root/.bash_history does not exist, skipping")
         except (subprocess.CalledProcessError, PermissionError) as e:
             print(f"❌ Failed to backup /root/.bash_history: {e}")
+            
+        # Backup .bashrc.d directory for root if it exists
+        try:
+            root_bashrc_d_path = "/root/.bashrc.d"
+            if os.path.exists(root_bashrc_d_path) and os.path.isdir(root_bashrc_d_path):
+                # Create target directory
+                os.makedirs(f"{temp_dir}/root/.bashrc.d", exist_ok=True)
+                
+                # If running as root, we can access files directly
+                if os.geteuid() == 0:
+                    # Copy all files from root's .bashrc.d
+                    files_backed_up = 0
+                    for item in os.listdir(root_bashrc_d_path):
+                        item_path = os.path.join(root_bashrc_d_path, item)
+                        if os.path.isfile(item_path):
+                            shutil.copy2(item_path, f"{temp_dir}/root/.bashrc.d/{item}")
+                            files_backed_up += 1
+                            print(f"  ✅ Backed up root .bashrc.d file: {item}")
+                    
+                    if files_backed_up > 0:
+                        print(f"✅ Backed up {files_backed_up} files from {root_bashrc_d_path}")
+                    else:
+                        print(f"⚠️ No files found in {root_bashrc_d_path}, directory is empty")
+                else:
+                    # Otherwise use sudo
+                    # Get a list of files in root's .bashrc.d
+                    file_list = subprocess.run(
+                        ["sudo", "find", root_bashrc_d_path, "-type", "f"],
+                        check=True,
+                        text=True,
+                        capture_output=True
+                    ).stdout.strip().split('\n')
+                    
+                    # Copy each file
+                    files_backed_up = 0
+                    for file_path in file_list:
+                        if file_path:  # Skip empty lines
+                            file_name = os.path.basename(file_path)
+                            subprocess.run(
+                                ["sudo", "cp", file_path, f"{temp_dir}/root/.bashrc.d/{file_name}"],
+                                check=True
+                            )
+                            files_backed_up += 1
+                            print(f"  ✅ Backed up root .bashrc.d file: {file_name}")
+                    
+                    if files_backed_up > 0:
+                        print(f"✅ Backed up {files_backed_up} files from {root_bashrc_d_path}")
+                    else:
+                        print(f"⚠️ No files found in {root_bashrc_d_path}, directory is empty")
+            else:
+                print(f"⚠️ {root_bashrc_d_path} does not exist or is not a directory, skipping")
+        except (subprocess.CalledProcessError, PermissionError) as e:
+            print(f"❌ Failed to backup {root_bashrc_d_path}: {e}")
 
         # Backup selected .ssh files for root (id*, *local, *.local, local)
         try:
