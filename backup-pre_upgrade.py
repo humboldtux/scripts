@@ -5,12 +5,17 @@ Backup script to create a pre-upgrade backup of important files:
 - .ssh directory for current user and root
 - ~/.bashrc.d directory for current user and root (if exists)
 - /etc/restic directory
+- /etc/network/interfaces and /etc/network/interfaces.d directory
+- /etc/fstab
 
 The backup is saved as ~/Documents/backup-pre_upgrade-HOSTNAME-XXXX.tgz where HOSTNAME is the machine hostname and XXXX is a timestamp.
 After backup, executes and displays output of:
 - yadm status
 - gita ll
 - docker ps -a
+- ip a
+- df -h
+- fdisk -l
 """
 
 import os
@@ -478,6 +483,103 @@ def create_backup():
         except (subprocess.CalledProcessError, PermissionError) as e:
             print(f"❌ Failed to backup /etc/restic: {e}")
 
+        # Backup /etc/network/interfaces file if it exists
+        try:
+            if os.path.exists("/etc/network/interfaces") and os.path.isfile("/etc/network/interfaces"):
+                # Create target directory
+                os.makedirs(f"{temp_dir}/etc/network", exist_ok=True)
+                
+                # If running as root, we can copy directly
+                if os.geteuid() == 0:
+                    shutil.copy2("/etc/network/interfaces", f"{temp_dir}/etc/network/interfaces")
+                    print("✅ Backed up /etc/network/interfaces")
+                else:
+                    # Otherwise use sudo
+                    subprocess.run(
+                        ["sudo", "cp", "/etc/network/interfaces", f"{temp_dir}/etc/network/interfaces"],
+                        check=True
+                    )
+                    print("✅ Backed up /etc/network/interfaces (with sudo)")
+            else:
+                print("⚠️ /etc/network/interfaces does not exist, skipping")
+        except (subprocess.CalledProcessError, PermissionError) as e:
+            print(f"❌ Failed to backup /etc/network/interfaces: {e}")
+            
+        # Backup /etc/network/interfaces.d directory if it exists
+        try:
+            interfaces_d_path = "/etc/network/interfaces.d"
+            if os.path.exists(interfaces_d_path) and os.path.isdir(interfaces_d_path):
+                # Create target directory
+                os.makedirs(f"{temp_dir}/etc/network/interfaces.d", exist_ok=True)
+                
+                # If running as root, we can access files directly
+                if os.geteuid() == 0:
+                    # Copy all files from interfaces.d
+                    files_backed_up = 0
+                    for item in os.listdir(interfaces_d_path):
+                        item_path = os.path.join(interfaces_d_path, item)
+                        if os.path.isfile(item_path):
+                            shutil.copy2(item_path, f"{temp_dir}/etc/network/interfaces.d/{item}")
+                            files_backed_up += 1
+                            print(f"  ✅ Backed up interfaces.d file: {item}")
+                    
+                    if files_backed_up > 0:
+                        print(f"✅ Backed up {files_backed_up} files from {interfaces_d_path}")
+                    else:
+                        print(f"⚠️ No files found in {interfaces_d_path}, directory is empty")
+                else:
+                    # Otherwise use sudo
+                    # Get a list of files in interfaces.d
+                    file_list = subprocess.run(
+                        ["sudo", "find", interfaces_d_path, "-type", "f"],
+                        check=True,
+                        text=True,
+                        capture_output=True
+                    ).stdout.strip().split('\n')
+                    
+                    # Copy each file
+                    files_backed_up = 0
+                    for file_path in file_list:
+                        if file_path:  # Skip empty lines
+                            file_name = os.path.basename(file_path)
+                            subprocess.run(
+                                ["sudo", "cp", file_path, f"{temp_dir}/etc/network/interfaces.d/{file_name}"],
+                                check=True
+                            )
+                            files_backed_up += 1
+                            print(f"  ✅ Backed up interfaces.d file: {file_name}")
+                    
+                    if files_backed_up > 0:
+                        print(f"✅ Backed up {files_backed_up} files from {interfaces_d_path}")
+                    else:
+                        print(f"⚠️ No files found in {interfaces_d_path}, directory is empty")
+            else:
+                print(f"⚠️ {interfaces_d_path} does not exist or is not a directory, skipping")
+        except (subprocess.CalledProcessError, PermissionError) as e:
+            print(f"❌ Failed to backup {interfaces_d_path}: {e}")
+            
+        # Backup /etc/fstab file if it exists
+        try:
+            if os.path.exists("/etc/fstab") and os.path.isfile("/etc/fstab"):
+                # Create target directory if it doesn't exist
+                os.makedirs(f"{temp_dir}/etc", exist_ok=True)
+                
+                # If running as root, we can copy directly
+                if os.geteuid() == 0:
+                    shutil.copy2("/etc/fstab", f"{temp_dir}/etc/fstab")
+                    print("✅ Backed up /etc/fstab")
+                else:
+                    # Otherwise use sudo
+                    subprocess.run(
+                        ["sudo", "cp", "/etc/fstab", f"{temp_dir}/etc/fstab"],
+                        check=True
+                    )
+                    print("✅ Backed up /etc/fstab (with sudo)")
+            else:
+                print("⚠️ /etc/fstab does not exist, skipping")
+        except (subprocess.CalledProcessError, PermissionError) as e:
+            print(f"❌ Failed to backup /etc/fstab: {e}")
+
         # Create a file for script output at the root of the archive
         output_file_path = f"{temp_dir}/script.output"
         # Write an initial message - we'll update this file later with complete output
@@ -614,6 +716,7 @@ def main():
             # Run root commands with output capture
             run_as_root("df -h")
             run_as_root("fdisk -l")
+            run_as_root("ip a")
             
             # Add completion timestamp
             capture_print(f"\nBackup completed at: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
