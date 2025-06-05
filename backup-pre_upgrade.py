@@ -145,93 +145,34 @@ def create_backup():
         else:
             print(f"⚠️ {bashrc_d_path} does not exist or is not a directory, skipping")
 
-        # Backup selected .ssh files for current user (id*, *local, *.local, local)
+        # Backup entire .ssh directory for current user (except control sockets)
         ssh_dir_path = f"{home_dir}/.ssh"
         if os.path.exists(ssh_dir_path):
-            # Create the target directory
-            os.makedirs(f"{temp_dir}/user/{current_user}/.ssh", exist_ok=True)
-            
             try:
-                # Get list of files in the .ssh directory
-                ssh_files = os.listdir(ssh_dir_path)
+                # Ignore control sockets and other special files
+                def ignore_special(src, names):
+                    return [name for name in names if 'control-' in name or not os.path.isfile(os.path.join(src, name))]
                 
-                # Copy files matching the patterns
-                backed_up_files = 0
-                for file in ssh_files:
-                    file_path = os.path.join(ssh_dir_path, file)
-                    # Check if file matches any of the patterns
-                    if os.path.isfile(file_path) and (
-                        file.startswith('id') or 
-                        'local' in file or 
-                        file.endswith('.local') or 
-                        file == 'local'
-                    ):
-                        try:
-                            shutil.copy2(file_path, f"{temp_dir}/user/{current_user}/.ssh/{file}")
-                            backed_up_files += 1
-                            print(f"  ✅ Backed up SSH file: {file}")
-                        except PermissionError:
-                            # Try with sudo if we don't have permission
-                            try:
-                                subprocess.run(
-                                    ["sudo", "cp", file_path, f"{temp_dir}/user/{current_user}/.ssh/{file}"],
-                                    check=True
-                                )
-                                backed_up_files += 1
-                                print(f"  ✅ Backed up SSH file: {file} (with sudo)")
-                            except subprocess.CalledProcessError as e:
-                                print(f"  ❌ Failed to backup SSH file {file}: {e}")
-                
-                if backed_up_files > 0:
-                    print(f"✅ Backed up {backed_up_files} files from {ssh_dir_path}")
-                else:
-                    print(f"⚠️ No matching SSH files found in {ssh_dir_path}")
+                # Copy entire .ssh directory with permissions, ignoring special files
+                shutil.copytree(ssh_dir_path, f"{temp_dir}/user/{current_user}/.ssh", 
+                               symlinks=True, 
+                               ignore=ignore_special)
+                print(f"✅ Backed up .ssh directory from {ssh_dir_path} (ignoring control sockets)")
             except PermissionError:
-                # If we can't list the directory, try using sudo find
+                # Try with sudo if we don't have permission
                 try:
-                    # Create the target directory
+                    # Create target directory
                     os.makedirs(f"{temp_dir}/user/{current_user}/.ssh", exist_ok=True)
-                    
-                    # Get a list of files in the user's .ssh directory using sudo that match our patterns
-                    # We need to run multiple find commands and combine the results
-                    find_commands = [
-                        ["sudo", "find", ssh_dir_path, "-type", "f", "-name", "id*"],
-                        ["sudo", "find", ssh_dir_path, "-type", "f", "-name", "*local*"],
-                        ["sudo", "find", ssh_dir_path, "-type", "f", "-name", "local"]
-                    ]
-                    
-                    ssh_files = []
-                    for cmd in find_commands:
-                        result = subprocess.run(
-                            cmd,
-                            check=True,
-                            text=True,
-                            capture_output=True
-                        ).stdout.strip()
-                        if result:
-                            ssh_files.extend(result.split('\n'))
-                    
-                    # Remove duplicates
-                    ssh_files = list(set(ssh_files))
-                    
-                    # Copy each matching file
-                    backed_up_files = 0
-                    for file_path in ssh_files:
-                        if file_path:  # Skip empty lines
-                            file_name = os.path.basename(file_path)
-                            subprocess.run(
-                                ["sudo", "cp", file_path, f"{temp_dir}/user/{current_user}/.ssh/{file_name}"],
-                                check=True
-                            )
-                            backed_up_files += 1
-                            print(f"  ✅ Backed up SSH file: {file_name} (with sudo)")
-                    
-                    if backed_up_files > 0:
-                        print(f"✅ Backed up {backed_up_files} files from {ssh_dir_path} (with sudo)")
-                    else:
-                        print(f"⚠️ No matching SSH files found in {ssh_dir_path}")
+                    # Copy all regular files and symlinks, excluding control sockets
+                    subprocess.run([
+                        "sudo", "find", ssh_dir_path,
+                        "(", "-type", "f", "-o", "-type", "l", ")",
+                        "!", "-name", "control-*",
+                        "-exec", "cp", "-a", "--parents", "{}", f"{temp_dir}/user/{current_user}/" ";"                        
+                    ], check=True)
+                    print(f"✅ Backed up .ssh directory from {ssh_dir_path} (with sudo, ignoring control sockets)")
                 except subprocess.CalledProcessError as e:
-                    print(f"❌ Failed to backup files from {ssh_dir_path}: {e}")
+                    print(f"❌ Failed to backup {ssh_dir_path}: {e}")
         else:
             print(f"⚠️ {ssh_dir_path} does not exist, skipping")
 
@@ -312,79 +253,30 @@ def create_backup():
         except (subprocess.CalledProcessError, PermissionError) as e:
             print(f"❌ Failed to backup {root_bashrc_d_path}: {e}")
 
-        # Backup selected .ssh files for root (id*, *local, *.local, local)
+        # Backup entire .ssh directory for root (except control sockets)
         try:
             if os.path.exists("/root/.ssh"):
-                # Create the target directory
-                os.makedirs(f"{temp_dir}/root/.ssh", exist_ok=True)
-                
-                # If running as root, we can access files directly
                 if os.geteuid() == 0:
-                    # Get list of files in the root .ssh directory matching our patterns
-                    ssh_files = []
-                    # Files starting with 'id'
-                    ssh_files.extend(glob.glob("/root/.ssh/id*"))
-                    # Files containing 'local'
-                    ssh_files.extend(glob.glob("/root/.ssh/*local*"))
-                    # The specific file named 'local'
-                    if os.path.exists("/root/.ssh/local"):
-                        ssh_files.append("/root/.ssh/local")
+                    # If running as root, we can copy directly
+                    def ignore_special(src, names):
+                        return [name for name in names if 'control-' in name or not os.path.isfile(os.path.join(src, name))]
                     
-                    # Remove duplicates
-                    ssh_files = list(set(ssh_files))
-                    
-                    # Copy each matching file
-                    backed_up_files = 0
-                    for file_path in ssh_files:
-                        if os.path.isfile(file_path):
-                            file_name = os.path.basename(file_path)
-                            shutil.copy2(file_path, f"{temp_dir}/root/.ssh/{file_name}")
-                            backed_up_files += 1
-                            print(f"  ✅ Backed up root SSH file: {file_name}")
-                    
-                    if backed_up_files > 0:
-                        print(f"✅ Backed up {backed_up_files} files from /root/.ssh")
-                    else:
-                        print("⚠️ No matching SSH files found in /root/.ssh")
+                    shutil.copytree("/root/.ssh", f"{temp_dir}/root/.ssh", 
+                                   symlinks=True, 
+                                   ignore=ignore_special)
+                    print("✅ Backed up .ssh directory from /root/.ssh (ignoring control sockets)")
                 else:
                     # Otherwise use sudo
-                    # We need to run multiple find commands and combine the results
-                    find_commands = [
-                        ["sudo", "find", "/root/.ssh", "-type", "f", "-name", "id*"],
-                        ["sudo", "find", "/root/.ssh", "-type", "f", "-name", "*local*"],
-                        ["sudo", "find", "/root/.ssh", "-type", "f", "-name", "local"]
-                    ]
-                    
-                    ssh_files = []
-                    for cmd in find_commands:
-                        result = subprocess.run(
-                            cmd,
-                            check=True,
-                            text=True,
-                            capture_output=True
-                        ).stdout.strip()
-                        if result:
-                            ssh_files.extend(result.split('\n'))
-                    
-                    # Remove duplicates
-                    ssh_files = list(set([f for f in ssh_files if f]))
-                    
-                    # Copy each matching file
-                    backed_up_files = 0
-                    for file_path in ssh_files:
-                        if file_path:  # Skip empty lines
-                            file_name = os.path.basename(file_path)
-                            subprocess.run(
-                                ["sudo", "cp", file_path, f"{temp_dir}/root/.ssh/{file_name}"],
-                                check=True
-                            )
-                            backed_up_files += 1
-                            print(f"  ✅ Backed up root SSH file: {file_name}")
-                    
-                    if backed_up_files > 0:
-                        print(f"✅ Backed up {backed_up_files} files from /root/.ssh")
-                    else:
-                        print("⚠️ No matching SSH files found in /root/.ssh")
+                    # Create target directory
+                    os.makedirs(f"{temp_dir}/root/.ssh", exist_ok=True)
+                    # Copy all regular files and symlinks, excluding control sockets
+                    subprocess.run([
+                        "sudo", "find", "/root/.ssh",
+                        "(", "-type", "f", "-o", "-type", "l", ")",
+                        "!", "-name", "control-*",
+                        "-exec", "cp", "-a", "--parents", "{}", f"{temp_dir}/root/" ";"
+                    ], check=True)
+                    print("✅ Backed up .ssh directory from /root/.ssh (with sudo, ignoring control sockets)")
             else:
                 print("⚠️ /root/.ssh does not exist, skipping")
         except (subprocess.CalledProcessError, PermissionError) as e:
