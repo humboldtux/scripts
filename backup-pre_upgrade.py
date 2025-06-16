@@ -13,6 +13,8 @@ After backup, executes and displays output of:
 - yadm status
 - gita ll
 - docker ps -a
+- podman ps -a
+- incus list local:
 - ip a
 - df -h
 - fdisk -l
@@ -604,6 +606,8 @@ def main():
             run_as_user("yadm status", actual_user)
             run_as_user("gita ll", actual_user)
             run_as_user("docker ps -a", actual_user)
+            run_as_user("podman ps -a", actual_user)
+            run_as_user("incus list local:", actual_user)
             
             # Run root commands with output capture
             run_as_root("df -h")
