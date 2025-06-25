@@ -4,6 +4,7 @@ Backup script to create a pre-upgrade backup of important files:
 - .bash_history for current user and root
 - .ssh directory for current user and root
 - ~/.bashrc.d directory for current user and root (if exists)
+- ~/.config/gtk-3.0/bookmarks for current user (if exists)
 - /etc/restic directory
 - /etc/network/interfaces and /etc/network/interfaces.d directory
 - /etc/fstab
@@ -177,6 +178,21 @@ def create_backup():
                     print(f"❌ Failed to backup {ssh_dir_path}: {e}")
         else:
             print(f"⚠️ {ssh_dir_path} does not exist, skipping")
+
+        # Backup GTK3 bookmarks for current user
+        gtk_bookmarks = os.path.join(home_dir, ".config/gtk-3.0/bookmarks")
+        if os.path.exists(gtk_bookmarks):
+            try:
+                # Create target directory structure
+                os.makedirs(os.path.join(temp_dir, "user", current_user, ".config/gtk-3.0"), exist_ok=True)
+                # Copy bookmarks file
+                shutil.copy2(gtk_bookmarks, 
+                           os.path.join(temp_dir, "user", current_user, ".config/gtk-3.0/bookmarks"))
+                print(f"✅ Backed up GTK3 bookmarks from {gtk_bookmarks}")
+            except Exception as e:
+                print(f"❌ Failed to backup GTK3 bookmarks: {e}")
+        else:
+            print(f"⚠️ {gtk_bookmarks} does not exist, skipping")
 
         # Backup .bash_history for root
         try:
