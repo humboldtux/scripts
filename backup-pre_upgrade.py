@@ -153,30 +153,16 @@ def create_backup():
         ssh_dir_path = f"{home_dir}/.ssh"
         if os.path.exists(ssh_dir_path):
             try:
-                # Ignore control sockets and other special files
-                def ignore_special(src, names):
-                    return [name for name in names if 'control-' in name or not os.path.isfile(os.path.join(src, name))]
+                # Copy entire .ssh directory first
+                target_ssh_dir = f"{temp_dir}/user/{current_user}/.ssh"
+                subprocess.run(["cp", "-a", ssh_dir_path, os.path.dirname(target_ssh_dir)], check=True)
                 
-                # Copy entire .ssh directory with permissions, ignoring special files
-                shutil.copytree(ssh_dir_path, f"{temp_dir}/user/{current_user}/.ssh", 
-                               symlinks=True, 
-                               ignore=ignore_special)
+                # Then remove control sockets if any
+                subprocess.run(["find", target_ssh_dir, "-name", "control-*", "-delete"], check=True)
+                
                 print(f"✅ Backed up .ssh directory from {ssh_dir_path} (ignoring control sockets)")
-            except PermissionError:
-                # Try with sudo if we don't have permission
-                try:
-                    # Create target directory
-                    os.makedirs(f"{temp_dir}/user/{current_user}/.ssh", exist_ok=True)
-                    # Copy all regular files and symlinks, excluding control sockets
-                    subprocess.run([
-                        "sudo", "find", ssh_dir_path,
-                        "(", "-type", "f", "-o", "-type", "l", ")",
-                        "!", "-name", "control-*",
-                        "-exec", "cp", "-a", "--parents", "{}", f"{temp_dir}/user/{current_user}/" ";"                        
-                    ], check=True)
-                    print(f"✅ Backed up .ssh directory from {ssh_dir_path} (with sudo, ignoring control sockets)")
-                except subprocess.CalledProcessError as e:
-                    print(f"❌ Failed to backup {ssh_dir_path}: {e}")
+            except subprocess.CalledProcessError as e:
+                print(f"❌ Failed to backup {ssh_dir_path}: {e}")
         else:
             print(f"⚠️ {ssh_dir_path} does not exist, skipping")
 
@@ -275,30 +261,17 @@ def create_backup():
         # Backup entire .ssh directory for root (except control sockets)
         try:
             if os.path.exists("/root/.ssh"):
-                if os.geteuid() == 0:
-                    # If running as root, we can copy directly
-                    def ignore_special(src, names):
-                        return [name for name in names if 'control-' in name or not os.path.isfile(os.path.join(src, name))]
-                    
-                    shutil.copytree("/root/.ssh", f"{temp_dir}/root/.ssh", 
-                                   symlinks=True, 
-                                   ignore=ignore_special)
-                    print("✅ Backed up .ssh directory from /root/.ssh (ignoring control sockets)")
-                else:
-                    # Otherwise use sudo
-                    # Create target directory
-                    os.makedirs(f"{temp_dir}/root/.ssh", exist_ok=True)
-                    # Copy all regular files and symlinks, excluding control sockets
-                    subprocess.run([
-                        "sudo", "find", "/root/.ssh",
-                        "(", "-type", "f", "-o", "-type", "l", ")",
-                        "!", "-name", "control-*",
-                        "-exec", "cp", "-a", "--parents", "{}", f"{temp_dir}/root/" ";"
-                    ], check=True)
-                    print("✅ Backed up .ssh directory from /root/.ssh (with sudo, ignoring control sockets)")
+                # Copy entire .ssh directory first
+                target_ssh_dir = f"{temp_dir}/root/.ssh"
+                subprocess.run(["sudo", "cp", "-a", "/root/.ssh", os.path.dirname(target_ssh_dir)], check=True)
+                
+                # Then remove control sockets if any
+                subprocess.run(["find", target_ssh_dir, "-name", "control-*", "-delete"], check=True)
+                
+                print("✅ Backed up .ssh directory from /root/.ssh (ignoring control sockets)")
             else:
                 print("⚠️ /root/.ssh does not exist, skipping")
-        except (subprocess.CalledProcessError, PermissionError) as e:
+        except subprocess.CalledProcessError as e:
             print(f"❌ Failed to backup /root/.ssh: {e}")
 
         # Backup /etc/ssh/sshd_config.d
@@ -307,25 +280,16 @@ def create_backup():
             if os.path.exists(sshd_config_dir):
                 # Create target directory
                 os.makedirs(f"{temp_dir}/etc/ssh/sshd_config.d", exist_ok=True)
-                
-                if os.geteuid() == 0:
-                    # If running as root, copy directly
-                    for item in os.listdir(sshd_config_dir):
-                        src = os.path.join(sshd_config_dir, item)
-                        if os.path.isfile(src):
-                            shutil.copy2(src, f"{temp_dir}/etc/ssh/sshd_config.d/")
-                    print(f"✅ Backed up {sshd_config_dir}")
-                else:
-                    # Otherwise use sudo
-                    subprocess.run([
-                        "sudo", "cp", "-a",
-                        f"{sshd_config_dir}/.",
-                        f"{temp_dir}/etc/ssh/sshd_config.d/"
-                    ], check=True)
-                    print(f"✅ Backed up {sshd_config_dir} (with sudo)")
+                # Use sudo to copy files
+                subprocess.run([
+                    "sudo", "cp", "-a",
+                    f"{sshd_config_dir}/.",
+                    f"{temp_dir}/etc/ssh/sshd_config.d/"
+                ], check=True)
+                print(f"✅ Backed up {sshd_config_dir}")
             else:
                 print(f"⚠️ {sshd_config_dir} does not exist, skipping")
-        except (subprocess.CalledProcessError, PermissionError) as e:
+        except subprocess.CalledProcessError as e:
             print(f"❌ Failed to backup {sshd_config_dir}: {e}")
 
         # Backup /etc/restic
