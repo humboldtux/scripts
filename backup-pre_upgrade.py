@@ -6,6 +6,7 @@ Backup script to create a pre-upgrade backup of important files:
 - ~/.bashrc.d directory for current user and root (if exists)
 - ~/.config/gtk-3.0/bookmarks for current user (if exists)
 - /etc/restic directory
+- /etc/ssh/sshd_config.d/ directory
 - /etc/network/interfaces and /etc/network/interfaces.d directory
 - /etc/fstab
 
@@ -299,6 +300,33 @@ def create_backup():
                 print("⚠️ /root/.ssh does not exist, skipping")
         except (subprocess.CalledProcessError, PermissionError) as e:
             print(f"❌ Failed to backup /root/.ssh: {e}")
+
+        # Backup /etc/ssh/sshd_config.d
+        sshd_config_dir = "/etc/ssh/sshd_config.d"
+        try:
+            if os.path.exists(sshd_config_dir):
+                # Create target directory
+                os.makedirs(f"{temp_dir}/etc/ssh/sshd_config.d", exist_ok=True)
+                
+                if os.geteuid() == 0:
+                    # If running as root, copy directly
+                    for item in os.listdir(sshd_config_dir):
+                        src = os.path.join(sshd_config_dir, item)
+                        if os.path.isfile(src):
+                            shutil.copy2(src, f"{temp_dir}/etc/ssh/sshd_config.d/")
+                    print(f"✅ Backed up {sshd_config_dir}")
+                else:
+                    # Otherwise use sudo
+                    subprocess.run([
+                        "sudo", "cp", "-a",
+                        f"{sshd_config_dir}/.",
+                        f"{temp_dir}/etc/ssh/sshd_config.d/"
+                    ], check=True)
+                    print(f"✅ Backed up {sshd_config_dir} (with sudo)")
+            else:
+                print(f"⚠️ {sshd_config_dir} does not exist, skipping")
+        except (subprocess.CalledProcessError, PermissionError) as e:
+            print(f"❌ Failed to backup {sshd_config_dir}: {e}")
 
         # Backup /etc/restic
         try:
