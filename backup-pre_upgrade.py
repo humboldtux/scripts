@@ -38,6 +38,18 @@ from contextlib import redirect_stdout, redirect_stderr
 from pathlib import Path
 
 
+def fix_temp_permissions(path):
+    """Fix permissions on temporary files copied with sudo."""
+    try:
+        # Change ownership of the directory and its contents to current user
+        current_user = os.getenv("SUDO_USER") or os.getenv("USER")
+        subprocess.run(["sudo", "chown", "-R", f"{current_user}:", path], check=True)
+        # Make sure we can read and write everything
+        subprocess.run(["sudo", "chmod", "-R", "u+rw", path], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️ Failed to fix permissions on {path}: {e}")
+
+
 def run_command(command, capture_output=False):
     """Run a shell command and display its output.
     If capture_output is True, returns the command output as a string."""
@@ -264,6 +276,7 @@ def create_backup():
                 # Copy entire .ssh directory first
                 target_ssh_dir = f"{temp_dir}/root/.ssh"
                 subprocess.run(["sudo", "cp", "-a", "/root/.ssh", os.path.dirname(target_ssh_dir)], check=True)
+                fix_temp_permissions(target_ssh_dir)
                 
                 # Then remove control sockets if any
                 subprocess.run(["find", target_ssh_dir, "-name", "control-*", "-delete"], check=True)
@@ -281,11 +294,13 @@ def create_backup():
                 # Create target directory
                 os.makedirs(f"{temp_dir}/etc/ssh/sshd_config.d", exist_ok=True)
                 # Use sudo to copy files
+                target_dir = f"{temp_dir}/etc/ssh/sshd_config.d"
                 subprocess.run([
                     "sudo", "cp", "-a",
                     f"{sshd_config_dir}/.",
-                    f"{temp_dir}/etc/ssh/sshd_config.d/"
+                    target_dir
                 ], check=True)
+                fix_temp_permissions(target_dir)
                 print(f"✅ Backed up {sshd_config_dir}")
             else:
                 print(f"⚠️ {sshd_config_dir} does not exist, skipping")
@@ -295,17 +310,13 @@ def create_backup():
         # Backup /etc/restic
         try:
             if os.path.exists("/etc/restic"):
-                # If running as root, we can copy directly
-                if os.geteuid() == 0:
-                    shutil.copytree("/etc/restic", f"{temp_dir}/etc/restic", symlinks=True)
-                    print("✅ Backed up /etc/restic")
-                else:
-                    # Otherwise use sudo
-                    subprocess.run(
-                        ["sudo", "cp", "-r", "/etc/restic", f"{temp_dir}/etc/restic"],
-                        check=True,
-                    )
-                    print("✅ Backed up /etc/restic (with sudo)")
+                # Copy /etc/restic with sudo
+                target_dir = f"{temp_dir}/etc/restic"
+                subprocess.run([
+                    "sudo", "cp", "-a", "/etc/restic", f"{temp_dir}/etc/"
+                ], check=True)
+                fix_temp_permissions(target_dir)
+                print("✅ Backed up /etc/restic (with sudo)")
                 
                 # Check for profiles.toml and backup sources from [local.backup] section
                 profiles_path = "/etc/restic/profiles.toml"
@@ -365,6 +376,7 @@ def create_backup():
                                                             ["sudo", "cp", source_path, target_path],
                                                             check=True
                                                         )
+                                                fix_temp_permissions(target_path)
                                                 print(f"  ✅ Backed up additional source: {source_path}")
                                             except (subprocess.CalledProcessError, PermissionError, shutil.Error) as e:
                                                 print(f"  ❌ Failed to backup {source_path}: {e}")
@@ -385,98 +397,71 @@ def create_backup():
         except (subprocess.CalledProcessError, PermissionError) as e:
             print(f"❌ Failed to backup /etc/restic: {e}")
 
-        # Backup /etc/network/interfaces file if it exists
+        # Backup /etc/network/interfaces
         try:
-            if os.path.exists("/etc/network/interfaces") and os.path.isfile("/etc/network/interfaces"):
-                # Create target directory
+            if os.path.exists("/etc/network/interfaces"):
+                # Create network directory in temp dir
                 os.makedirs(f"{temp_dir}/etc/network", exist_ok=True)
                 
-                # If running as root, we can copy directly
-                if os.geteuid() == 0:
-                    shutil.copy2("/etc/network/interfaces", f"{temp_dir}/etc/network/interfaces")
-                    print("✅ Backed up /etc/network/interfaces")
-                else:
-                    # Otherwise use sudo
-                    subprocess.run(
-                        ["sudo", "cp", "/etc/network/interfaces", f"{temp_dir}/etc/network/interfaces"],
-                        check=True
-                    )
-                    print("✅ Backed up /etc/network/interfaces (with sudo)")
+                # Copy with sudo
+                target_file = f"{temp_dir}/etc/network/interfaces"
+                subprocess.run([
+                    "sudo", "cp", "-a", "/etc/network/interfaces", f"{temp_dir}/etc/network/"
+                ], check=True)
+                fix_temp_permissions(target_file)
+                print("✅ Backed up /etc/network/interfaces (with sudo)")
             else:
                 print("⚠️ /etc/network/interfaces does not exist, skipping")
         except (subprocess.CalledProcessError, PermissionError) as e:
             print(f"❌ Failed to backup /etc/network/interfaces: {e}")
-            
-        # Backup /etc/network/interfaces.d directory if it exists
+
+        # Backup /etc/network/interfaces.d directory
+        interfaces_d_path = "/etc/network/interfaces.d"
         try:
-            interfaces_d_path = "/etc/network/interfaces.d"
             if os.path.exists(interfaces_d_path) and os.path.isdir(interfaces_d_path):
                 # Create target directory
                 os.makedirs(f"{temp_dir}/etc/network/interfaces.d", exist_ok=True)
                 
-                # If running as root, we can access files directly
-                if os.geteuid() == 0:
-                    # Copy all files from interfaces.d
-                    files_backed_up = 0
-                    for item in os.listdir(interfaces_d_path):
-                        item_path = os.path.join(interfaces_d_path, item)
-                        if os.path.isfile(item_path):
-                            shutil.copy2(item_path, f"{temp_dir}/etc/network/interfaces.d/{item}")
-                            files_backed_up += 1
-                            print(f"  ✅ Backed up interfaces.d file: {item}")
-                    
-                    if files_backed_up > 0:
-                        print(f"✅ Backed up {files_backed_up} files from {interfaces_d_path}")
-                    else:
-                        print(f"⚠️ No files found in {interfaces_d_path}, directory is empty")
+                # Get a list of files in interfaces.d using sudo
+                file_list = subprocess.run(
+                    ["sudo", "find", interfaces_d_path, "-type", "f"],
+                    check=True,
+                    text=True,
+                    capture_output=True
+                ).stdout.strip().split('\n')
+                
+                # Copy each file with sudo
+                files_backed_up = 0
+                for file_path in file_list:
+                    if file_path:  # Skip empty lines
+                        file_name = os.path.basename(file_path)
+                        target_path = f"{temp_dir}/etc/network/interfaces.d/{file_name}"
+                        subprocess.run([
+                            "sudo", "cp", "-a", file_path, target_path
+                        ], check=True)
+                        fix_temp_permissions(target_path)
+                        files_backed_up += 1
+                        print(f"  ✅ Backed up interfaces.d file: {file_name}")
+                
+                if files_backed_up > 0:
+                    print(f"✅ Backed up {files_backed_up} files from {interfaces_d_path}")
                 else:
-                    # Otherwise use sudo
-                    # Get a list of files in interfaces.d
-                    file_list = subprocess.run(
-                        ["sudo", "find", interfaces_d_path, "-type", "f"],
-                        check=True,
-                        text=True,
-                        capture_output=True
-                    ).stdout.strip().split('\n')
-                    
-                    # Copy each file
-                    files_backed_up = 0
-                    for file_path in file_list:
-                        if file_path:  # Skip empty lines
-                            file_name = os.path.basename(file_path)
-                            subprocess.run(
-                                ["sudo", "cp", file_path, f"{temp_dir}/etc/network/interfaces.d/{file_name}"],
-                                check=True
-                            )
-                            files_backed_up += 1
-                            print(f"  ✅ Backed up interfaces.d file: {file_name}")
-                    
-                    if files_backed_up > 0:
-                        print(f"✅ Backed up {files_backed_up} files from {interfaces_d_path}")
-                    else:
-                        print(f"⚠️ No files found in {interfaces_d_path}, directory is empty")
+                    print(f"⚠️ No files found in {interfaces_d_path}, directory is empty")
             else:
                 print(f"⚠️ {interfaces_d_path} does not exist or is not a directory, skipping")
         except (subprocess.CalledProcessError, PermissionError) as e:
             print(f"❌ Failed to backup {interfaces_d_path}: {e}")
-            
-        # Backup /etc/fstab file if it exists
+
+        # Backup /etc/fstab
         try:
-            if os.path.exists("/etc/fstab") and os.path.isfile("/etc/fstab"):
-                # Create target directory if it doesn't exist
-                os.makedirs(f"{temp_dir}/etc", exist_ok=True)
-                
-                # If running as root, we can copy directly
-                if os.geteuid() == 0:
-                    shutil.copy2("/etc/fstab", f"{temp_dir}/etc/fstab")
-                    print("✅ Backed up /etc/fstab")
-                else:
-                    # Otherwise use sudo
-                    subprocess.run(
-                        ["sudo", "cp", "/etc/fstab", f"{temp_dir}/etc/fstab"],
-                        check=True
-                    )
-                    print("✅ Backed up /etc/fstab (with sudo)")
+            if os.path.exists("/etc/fstab"):
+                # Copy with sudo
+                target_file = f"{temp_dir}/etc/fstab"
+                subprocess.run([
+                    "sudo", "cp", "-a", "/etc/fstab", f"{temp_dir}/etc/"
+                ], check=True)
+                fix_temp_permissions(target_file)
+                print("✅ Backed up /etc/fstab (with sudo)")
             else:
                 print("⚠️ /etc/fstab does not exist, skipping")
         except (subprocess.CalledProcessError, PermissionError) as e:
