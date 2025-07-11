@@ -1,0 +1,152 @@
+#!/bin/bash
+
+# Check if script is run with sudo
+if [ "$(id -u)" -ne 0 ]; then
+    echo "❌ This script must be run with sudo privileges"
+    exit 1
+fi
+
+# Display help
+show_help() {
+    cat << EOF
+Usage: $(basename "$0") [OPTIONS] [PATH]
+
+Scan for and clean unused home directories.
+
+Options:
+  -h    Display this help message
+
+Arguments:
+  PATH  Directory to scan for unused home directories (default: /home)
+
+Description:
+  This script detects directories that don't correspond to any system user.
+  It will display an interactive checklist of unused directories and move
+  the selected ones to a 'cleaned/YYYYMMDD' subdirectory.
+
+Requirements:
+  - sudo privileges
+  - gum (https://github.com/charmbracelet/gum)
+
+Examples:
+  sudo $(basename "$0")           # Scan /home
+  sudo $(basename "$0") /opt/homes  # Scan /opt/homes
+
+Note:
+  The script requires appropriate permissions to read the target directory
+  and move the selected directories.
+EOF
+}
+
+# Parse options
+while getopts "h" opt; do
+    case $opt in
+        h)
+            show_help
+            exit 0
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            show_help
+            exit 1
+            ;;
+    esac
+done
+
+# Shift off the options and optional --
+shift $((OPTIND-1))
+
+# Check if gum is installed
+if ! command -v gum &> /dev/null; then
+    echo "❌ gum is not installed. Please install it first:"
+    echo "https://github.com/charmbracelet/gum#installation"
+    exit 1
+fi
+
+# Function to check if a user exists in the system (local or SSSD)
+is_valid_user() {
+    local username="$1"
+    getent passwd "$username" &>/dev/null
+    return $?
+}
+
+# Function to get list of actual directories in target path
+get_actual_homedirs() {
+    local target_path="$1"
+    find "$target_path" -mindepth 1 -maxdepth 1 -type d | sort
+}
+
+# Function to check if a directory name corresponds to a system user
+is_system_user() {
+    local dirname="$1"
+    is_valid_user "$dirname"
+    return $?
+}
+
+# Get target path from argument or use default
+target_path="${1:-/home}"
+
+# Get today's date for the cleaned directory
+today=$(date +%Y%m%d)
+cleaned_dir="$target_path/.cleaned/$today"
+
+# Get actual homedirs
+readarray -t actual_homedirs < <(get_actual_homedirs "$target_path")
+
+# Find unused homedirs
+unused_homedirs=()
+for dir in "${actual_homedirs[@]}"; do
+    # Skip the cleaned directory itself
+    if [[ "$dir" == "$target_path/.cleaned" ]]; then
+        continue
+    fi
+    
+    # Get just the directory name without the path
+    dirname=$(basename "$dir")
+    
+    if ! is_system_user "$dirname"; then
+        unused_homedirs+=("$dir")
+    fi
+done
+
+# If no unused homedirs found, exit
+if [ ${#unused_homedirs[@]} -eq 0 ]; then
+    echo "✅ No unused home directories found in $target_path"
+    exit 0
+fi
+
+# Display unused homedirs with gum choose
+echo "📂 Found ${#unused_homedirs[@]} unused home directories in $target_path"
+echo "Select directories to clean:"
+
+selected_dirs=($(printf "%s\n" "${unused_homedirs[@]}" | gum choose --no-limit))
+
+# If no directories selected, exit
+if [ ${#selected_dirs[@]} -eq 0 ]; then
+    echo "❌ No directories selected for cleaning"
+    exit 0
+fi
+
+# Create .cleaned directory with secure permissions if it doesn't exist
+if [ ! -d "$target_path/.cleaned" ]; then
+    mkdir "$target_path/.cleaned"
+    chown root:root "$target_path/.cleaned"
+    chmod 700 "$target_path/.cleaned"
+fi
+
+# Create today's directory
+mkdir -p "$cleaned_dir"
+chown root:root "$cleaned_dir"
+chmod 700 "$cleaned_dir"
+
+# Move selected directories
+for dir in "${selected_dirs[@]}"; do
+    dirname=$(basename "$dir")
+    if mv "$dir" "$cleaned_dir/"; then
+        echo "✅ Moved $dirname to .cleaned/$today/"
+    else
+        echo "❌ Failed to move $dirname"
+    fi
+done
+
+echo "🧹 Cleaning complete! Unused directories moved to .cleaned/$today/"
